@@ -7,6 +7,7 @@ package org.osflash.signals {
 		public var mock:Mock;
 		
 		public function MockDeluxeSignal() {
+			mock = new Mock(this);
 		}
 		
 		public function get numListeners():uint {

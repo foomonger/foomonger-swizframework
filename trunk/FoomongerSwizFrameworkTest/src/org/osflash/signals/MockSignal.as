@@ -7,6 +7,7 @@ package org.osflash.signals {
 		public var mock:Mock;
 	
 		public function MockSignal() {
+			mock = new Mock(this);
 		}
 
 		public function get valueClasses():Array {

@@ -41,7 +41,9 @@ package com.foomonger.swizframework.processors {
 		
 		public function MediateSignalProcessorTest(methodName:String=null) {
 			super(methodName);
-
+		}
+		
+		override public function setUp():void {
 			signal = new MockSignal();
 			deluxeSignal = new MockDeluxeSignal();
 			decoratedBeanSource = new Mock();
@@ -64,133 +66,80 @@ package com.foomonger.swizframework.processors {
 
 			swiz = new Swiz(new EventDispatcher(), new SwizConfig(), null, [beanProvider], [processor]);			
 			swiz.init();
-
+			
+			processor.init(swiz);
 		}
 				
 		public function test_setUpMetadataTag_signal_byBeanName_defaultProperty():void {
-			// Create metadataTag
 			var defaultArg:MetadataArg = new MetadataArg("", SIGNAL_BEAN_NAME);
 			var metadataTag:IMetadataTag = createMetadataTag([defaultArg]);
-			// Create signal expectations
-			signal.mock = new Mock(signal);
 			signal.mock.method("add").once.withArgs(listener);
-			// Run processor
-			processor.init(swiz);
 			processor.setUpMetadataTag(metadataTag, decoratedBean);
-			// Verify
 			signal.mock.verify();
 		}
 		
 		public function test_setUpMetadataTag_signal_byBeanName_beanProperty():void {
-			// Create metadataTag
 			var beanArg:MetadataArg = new MetadataArg("bean", SIGNAL_BEAN_NAME);
 			var metadataTag:IMetadataTag = createMetadataTag([beanArg]);
-			// Create signal expectations
-			signal.mock = new Mock(signal);
 			signal.mock.method("add").once.withArgs(listener);
-			// Run processor
-			processor.init(swiz);
 			processor.setUpMetadataTag(metadataTag, decoratedBean);
-			// Verify
 			signal.mock.verify();
 		}
 		
 		public function test_setUpMetadataTag_signal_byBeanType():void {
-			// Create metadataTag
 			var typeArg:MetadataArg = new MetadataArg("type", getQualifiedClassName(signal));
 			var metadataTag:IMetadataTag = createMetadataTag([typeArg]);
-			// Create signal expectations
-			signal.mock = new Mock(signal);
 			signal.mock.method("add").once.withArgs(listener);
-			// Run processor
-			processor.init(swiz);
 			processor.setUpMetadataTag(metadataTag, decoratedBean);
-			// Verify
 			signal.mock.verify();
 		}
 		
 		public function test_setUpMetadataTag_deluxeSignal_defaultPriority():void {
-			// Create metadataTag
 			var defaultArg:MetadataArg = new MetadataArg("", DELUXE_SIGNAL_BEAN_NAME);
 			var metadataTag:IMetadataTag = createMetadataTag([defaultArg]);
-			// Create signal expectations
-			deluxeSignal.mock = new Mock(deluxeSignal);
 			deluxeSignal.mock.method("add").once.withArgs(listener, 0);
-			// Run processor
-			processor.init(swiz);
 			processor.setUpMetadataTag(metadataTag, decoratedBean);
-			// Verify
 			deluxeSignal.mock.verify();
 		}
 		
 		public function test_setUpMetadataTag_deluxeSignal_priorityArg():void {
-			// Create metadataTag
 			var defaultArg:MetadataArg = new MetadataArg("", DELUXE_SIGNAL_BEAN_NAME);
 			var priorityArg:MetadataArg = new MetadataArg("priority", "2");
 			var metadataTag:IMetadataTag = createMetadataTag([defaultArg, priorityArg]);
-			// Create signal expectations
-			deluxeSignal.mock = new Mock(deluxeSignal);
 			deluxeSignal.mock.method("add").once.withArgs(listener, int(priorityArg.value));
-			// Run processor
-			processor.init(swiz);
 			processor.setUpMetadataTag(metadataTag, decoratedBean);
-			// Verify
 			deluxeSignal.mock.verify();
 		}
 		
 		public function test_tearDownMetadataTag_signal_byBeanName_defaultProperty():void {
-			// Create metadataTag
 			var defaultArg:MetadataArg = new MetadataArg("", SIGNAL_BEAN_NAME);
 			var metadataTag:IMetadataTag = createMetadataTag([defaultArg]);
-			// Create signal expectations
-			signal.mock = new Mock(signal);
 			signal.mock.method("remove").once.withArgs(listener);
-			// Run processor
-			processor.init(swiz);
 			processor.tearDownMetadataTag(metadataTag, decoratedBean);
-			// Verify
 			signal.mock.verify();
 		}
 				
 		public function test_tearDownMetadataTag_signal_byBeanName_beanProperty():void {
-			// Create metadataTag
 			var beanArg:MetadataArg = new MetadataArg("bean", SIGNAL_BEAN_NAME);
 			var metadataTag:IMetadataTag = createMetadataTag([beanArg]);
-			// Create signal expectations
-			signal.mock = new Mock(signal);
 			signal.mock.method("remove").once.withArgs(listener);
-			// Run processor
-			processor.init(swiz);
 			processor.tearDownMetadataTag(metadataTag, decoratedBean);
-			// Verify
 			signal.mock.verify();
 		}
 		
 		public function test_tearDownMetadataTag_signal_byBeanType():void {
-			// Create metadataTag
 			var typeArg:MetadataArg = new MetadataArg("type", getQualifiedClassName(signal));
 			var metadataTag:IMetadataTag = createMetadataTag([typeArg]);
-			// Create signal expectations
-			signal.mock = new Mock(signal);
 			signal.mock.method("remove").once.withArgs(listener);
-			// Run processor
-			processor.init(swiz);
 			processor.tearDownMetadataTag(metadataTag, decoratedBean);
-			// Verify
 			signal.mock.verify();
 		}
 		
 		public function test_tearDownMetadataTag_deluxeSignal():void {
-			// Create metadataTag
 			var defaultArg:MetadataArg = new MetadataArg("", DELUXE_SIGNAL_BEAN_NAME);
 			var metadataTag:IMetadataTag = createMetadataTag([defaultArg]);
-			// Create signal expectations
-			deluxeSignal.mock = new Mock(deluxeSignal);
 			deluxeSignal.mock.method("remove").once.withArgs(listener);
-			// Run processor
-			processor.init(swiz);
 			processor.tearDownMetadataTag(metadataTag, decoratedBean);
-			// Verify
 			deluxeSignal.mock.verify();
 		}
 			
