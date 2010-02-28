@@ -17,4 +17,4 @@ Bean type. E.g.
 You may also use !DeluxeSignals and define the priority. E.g.
  {{{[MediateSignal(bean="myDeluxeSignalBean", priority="2")]}}}
 
-Don't forget to add {{{[MediateSignal]}}} to the list of metadata tags to keep when compiling.
+Don't forget to add {{{[MediateSignal]}}} to the list of metadata tags to keep when compiling and also to add !MediateSignalProcessor to the Swiz instance.
