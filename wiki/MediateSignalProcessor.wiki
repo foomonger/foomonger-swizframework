@@ -1,0 +1,18 @@
+#summary Using the [MediateSignal] custom metadata tag
+
+!MediateSignalProcessor is the Signal version of !MediateProcessor. When you decorate a method with {{{[MediateSignal]}}} the processor will add it to a Signal Bean. You define which Signal Bean to use by:
+
+Bean name. E.g. 
+ {{{[MediateSignal(bean="mySignalBeanName")]}}}
+
+ "bean" is the default property so the above is the same as:
+
+ {{{[MediateSignal("mySignalBeanName")]}}}
+
+Bean type. E.g.
+ {{{[MediateSignal(type="com.foomonger.signals.UpdateBarSignal")]}}}
+  
+ This is useful when subclassing Signals.
+
+You may also use !DeluxeSignals and define the priority. E.g.
+ {{{[MediateSignal(bean="myDeluxeSignalBean", priority="2")]}}}
