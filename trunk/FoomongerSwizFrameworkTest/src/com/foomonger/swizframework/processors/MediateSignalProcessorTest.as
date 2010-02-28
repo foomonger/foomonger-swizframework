@@ -142,7 +142,15 @@ package com.foomonger.swizframework.processors {
 			processor.tearDownMetadataTag(metadataTag, decoratedBean);
 			deluxeSignal.mock.verify();
 		}
-			
+		
+		public function test_setUpMetadataTag_beanNotFound():void {
+			var defaultArg:MetadataArg = new MetadataArg("", "nonExistantBeanName");
+			var metadataTag:IMetadataTag = createMetadataTag([defaultArg]);
+			signal.mock.method("add").never;
+			processor.setUpMetadataTag(metadataTag, decoratedBean);
+			signal.mock.verify();
+		}
+		
 		private function createMetadataTag(args:Array):IMetadataTag {
 			var metadataTag:IMetadataTag = new BaseMetadataTag();
 			metadataTag.args = args;
