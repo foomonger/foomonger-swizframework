@@ -6,6 +6,7 @@ package com.foomonger.swizframework.processors {
 	import flash.utils.describeType;
 	import flash.utils.getQualifiedClassName;
 	
+	import flexunit.framework.AssertionFailedError;
 	import flexunit.framework.TestCase;
 	
 	import org.osflash.signals.MockDeluxeSignal;
@@ -16,10 +17,10 @@ package com.foomonger.swizframework.processors {
 	import org.swizframework.core.ISwiz;
 	import org.swizframework.core.Swiz;
 	import org.swizframework.core.SwizConfig;
-	import org.swizframework.reflection.BaseMetadataHost;
 	import org.swizframework.reflection.BaseMetadataTag;
 	import org.swizframework.reflection.IMetadataTag;
 	import org.swizframework.reflection.MetadataArg;
+	import org.swizframework.reflection.MetadataHostMethod;
 	import org.swizframework.reflection.TypeDescriptor;
 	
 	public class MediateSignalProcessorTest extends TestCase {
@@ -27,6 +28,8 @@ package com.foomonger.swizframework.processors {
 		private static const SIGNAL_BEAN_NAME:String = "signalBean";
 		private static const DELUXE_SIGNAL_BEAN_NAME:String = "deluxeSignalBean";
 		private static const DECORATED_LISTENER_NAME:String = "listener";
+		private static const SIGNAL_CLASS_PACKAGE:String = "org.osflash.signals";
+		private static const SIGNAL_CLASS_NAME:String = "MockSignal";
 		
 		private var swiz:ISwiz;
 		private var processor:MediateSignalProcessor;
@@ -38,9 +41,11 @@ package com.foomonger.swizframework.processors {
 		private var deluxeSignal:MockDeluxeSignal;
 		private var decoratedBeanSource:Mock;
 		private var listener:Function;
+		private var listenerHostNode:XML;
 		
 		public function MediateSignalProcessorTest(methodName:String=null) {
 			super(methodName);
+			listenerHostNode = <method name={DECORATED_LISTENER_NAME} returnType="void"/>;
 		}
 		
 		override public function setUp():void {
@@ -72,7 +77,8 @@ package com.foomonger.swizframework.processors {
 				
 		public function test_setUpMetadataTag_signal_byBeanName_defaultProperty():void {
 			var defaultArg:MetadataArg = new MetadataArg("", SIGNAL_BEAN_NAME);
-			var metadataTag:IMetadataTag = createMetadataTag([defaultArg]);
+			var metadataTag:IMetadataTag = createMetadataTag([defaultArg], listenerHostNode);
+			signal.mock.property("valueClasses").returns([]);
 			signal.mock.method("add").once.withArgs(listener);
 			processor.setUpMetadataTag(metadataTag, decoratedBean);
 			signal.mock.verify();
@@ -80,7 +86,8 @@ package com.foomonger.swizframework.processors {
 		
 		public function test_setUpMetadataTag_signal_byBeanName_beanProperty():void {
 			var beanArg:MetadataArg = new MetadataArg("bean", SIGNAL_BEAN_NAME);
-			var metadataTag:IMetadataTag = createMetadataTag([beanArg]);
+			var metadataTag:IMetadataTag = createMetadataTag([beanArg], listenerHostNode);
+			signal.mock.property("valueClasses").returns([]);
 			signal.mock.method("add").once.withArgs(listener);
 			processor.setUpMetadataTag(metadataTag, decoratedBean);
 			signal.mock.verify();
@@ -88,7 +95,8 @@ package com.foomonger.swizframework.processors {
 		
 		public function test_setUpMetadataTag_signal_byBeanType():void {
 			var typeArg:MetadataArg = new MetadataArg("type", getQualifiedClassName(signal));
-			var metadataTag:IMetadataTag = createMetadataTag([typeArg]);
+			var metadataTag:IMetadataTag = createMetadataTag([typeArg], listenerHostNode);
+			signal.mock.property("valueClasses").returns([]);
 			signal.mock.method("add").once.withArgs(listener);
 			processor.setUpMetadataTag(metadataTag, decoratedBean);
 			signal.mock.verify();
@@ -96,7 +104,8 @@ package com.foomonger.swizframework.processors {
 		
 		public function test_setUpMetadataTag_deluxeSignal_defaultPriority():void {
 			var defaultArg:MetadataArg = new MetadataArg("", DELUXE_SIGNAL_BEAN_NAME);
-			var metadataTag:IMetadataTag = createMetadataTag([defaultArg]);
+			var metadataTag:IMetadataTag = createMetadataTag([defaultArg], listenerHostNode);
+			deluxeSignal.mock.property("valueClasses").returns([]);
 			deluxeSignal.mock.method("add").once.withArgs(listener, 0);
 			processor.setUpMetadataTag(metadataTag, decoratedBean);
 			deluxeSignal.mock.verify();
@@ -105,7 +114,8 @@ package com.foomonger.swizframework.processors {
 		public function test_setUpMetadataTag_deluxeSignal_priorityArg():void {
 			var defaultArg:MetadataArg = new MetadataArg("", DELUXE_SIGNAL_BEAN_NAME);
 			var priorityArg:MetadataArg = new MetadataArg("priority", "2");
-			var metadataTag:IMetadataTag = createMetadataTag([defaultArg, priorityArg]);
+			var metadataTag:IMetadataTag = createMetadataTag([defaultArg, priorityArg], listenerHostNode);
+			deluxeSignal.mock.property("valueClasses").returns([]);
 			deluxeSignal.mock.method("add").once.withArgs(listener, int(priorityArg.value));
 			processor.setUpMetadataTag(metadataTag, decoratedBean);
 			deluxeSignal.mock.verify();
@@ -113,7 +123,7 @@ package com.foomonger.swizframework.processors {
 		
 		public function test_tearDownMetadataTag_signal_byBeanName_defaultProperty():void {
 			var defaultArg:MetadataArg = new MetadataArg("", SIGNAL_BEAN_NAME);
-			var metadataTag:IMetadataTag = createMetadataTag([defaultArg]);
+			var metadataTag:IMetadataTag = createMetadataTag([defaultArg], listenerHostNode);
 			signal.mock.method("remove").once.withArgs(listener);
 			processor.tearDownMetadataTag(metadataTag, decoratedBean);
 			signal.mock.verify();
@@ -121,7 +131,7 @@ package com.foomonger.swizframework.processors {
 				
 		public function test_tearDownMetadataTag_signal_byBeanName_beanProperty():void {
 			var beanArg:MetadataArg = new MetadataArg("bean", SIGNAL_BEAN_NAME);
-			var metadataTag:IMetadataTag = createMetadataTag([beanArg]);
+			var metadataTag:IMetadataTag = createMetadataTag([beanArg], listenerHostNode);
 			signal.mock.method("remove").once.withArgs(listener);
 			processor.tearDownMetadataTag(metadataTag, decoratedBean);
 			signal.mock.verify();
@@ -129,7 +139,7 @@ package com.foomonger.swizframework.processors {
 		
 		public function test_tearDownMetadataTag_signal_byBeanType():void {
 			var typeArg:MetadataArg = new MetadataArg("type", getQualifiedClassName(signal));
-			var metadataTag:IMetadataTag = createMetadataTag([typeArg]);
+			var metadataTag:IMetadataTag = createMetadataTag([typeArg], listenerHostNode);
 			signal.mock.method("remove").once.withArgs(listener);
 			processor.tearDownMetadataTag(metadataTag, decoratedBean);
 			signal.mock.verify();
@@ -137,7 +147,7 @@ package com.foomonger.swizframework.processors {
 		
 		public function test_tearDownMetadataTag_deluxeSignal():void {
 			var defaultArg:MetadataArg = new MetadataArg("", DELUXE_SIGNAL_BEAN_NAME);
-			var metadataTag:IMetadataTag = createMetadataTag([defaultArg]);
+			var metadataTag:IMetadataTag = createMetadataTag([defaultArg], listenerHostNode);
 			deluxeSignal.mock.method("remove").once.withArgs(listener);
 			processor.tearDownMetadataTag(metadataTag, decoratedBean);
 			deluxeSignal.mock.verify();
@@ -145,17 +155,100 @@ package com.foomonger.swizframework.processors {
 		
 		public function test_setUpMetadataTag_beanNotFound():void {
 			var defaultArg:MetadataArg = new MetadataArg("", "nonExistantBeanName");
-			var metadataTag:IMetadataTag = createMetadataTag([defaultArg]);
+			var metadataTag:IMetadataTag = createMetadataTag([defaultArg], listenerHostNode);
+			signal.mock.property("valueClasses").returns([]);
 			signal.mock.method("add").never;
 			processor.setUpMetadataTag(metadataTag, decoratedBean);
 			signal.mock.verify();
 		}
 		
-		private function createMetadataTag(args:Array):IMetadataTag {
+		public function test_setUpMetadataTag_signal_byBeanType_signalPackages():void {
+			var typeArg:MetadataArg = new MetadataArg("type", SIGNAL_CLASS_NAME);
+			var metadataTag:IMetadataTag = createMetadataTag([typeArg], listenerHostNode);
+			signal.mock.property("valueClasses").returns([]);
+			signal.mock.method("add").once.withArgs(listener);
+			processor.signalPackages = SIGNAL_CLASS_PACKAGE;
+			processor.setUpMetadataTag(metadataTag, decoratedBean);
+			signal.mock.verify();
+		}
+
+		public function test_setUpMetadataTag_argumentLengthValidation():void {
+			var defaultArg:MetadataArg = new MetadataArg("", SIGNAL_BEAN_NAME);
+			var invalidListenerHostNode:XML = <method name="listener" returnType="void">
+												<parameter index="1" type="String" optional="false"/>
+												<parameter index="2" type="String" optional="false"/>
+											</method>;
+			var metadataTag:IMetadataTag = createMetadataTag([defaultArg], invalidListenerHostNode);
+			signal.mock.property("valueClasses").returns([String]);
+			signal.mock.method("add").never;
+		 	try {
+		 		processor.setUpMetadataTag(metadataTag, decoratedBean);
+		    	// We expect an error
+		    	fail("Argument validation failed");
+			} catch (error:Error) {
+				if (error is AssertionFailedError) {
+            		throw error;
+        		}
+			}
+			signal.mock.verify();
+		}
+		
+		public function test_setUpMetadataTag_argumentTypeValidation_loose():void {
+			var defaultArg:MetadataArg = new MetadataArg("", SIGNAL_BEAN_NAME);
+			var invalidListenerHostNode:XML = <method name="listener" returnType="void">
+												<parameter index="1" type="String" optional="false"/>
+												<parameter index="2" type="Boolean" optional="false"/>
+											</method>;
+			var metadataTag:IMetadataTag = createMetadataTag([defaultArg], invalidListenerHostNode);
+			signal.mock.property("valueClasses").returns([String, String]);
+			signal.mock.method("add").once.withArgs(listener); // Passing listener isn't fully accurate but doesn't matter here
+	 		processor.setUpMetadataTag(metadataTag, decoratedBean);
+			signal.mock.verify();
+		}
+		
+		public function test_setUpMetadataTag_argumentTypeValidation_strict():void {
+			var defaultArg:MetadataArg = new MetadataArg("", SIGNAL_BEAN_NAME);
+			var invalidListenerHostNode:XML = <method name="listener" returnType="void">
+												<parameter index="1" type="String" optional="false"/>
+												<parameter index="2" type="Boolean" optional="false"/>
+											</method>;
+			var metadataTag:IMetadataTag = createMetadataTag([defaultArg], invalidListenerHostNode);
+			signal.mock.property("valueClasses").returns([String, String]);
+			signal.mock.method("add").never;
+			processor.strictArgumentTypes = true;
+	 		try {
+		 		processor.setUpMetadataTag(metadataTag, decoratedBean);
+		    	// We expect an error
+		    	fail("Argument validation failed");
+			} catch (error:Error) {
+				if (error is AssertionFailedError) {
+            		throw error;
+        		}
+			}
+			signal.mock.verify();
+		}
+		
+		public function test_set_signalPackages():void {
+			processor.signalPackages = "a.b.c";
+			assertEquals(1, processor.signalPackages.length);
+			assertEquals("a.b.c", processor.signalPackages[0]);
+			
+			processor.signalPackages = ["a.b.c", "d.e.f"];
+			assertEquals(2, processor.signalPackages.length);
+			assertEquals("a.b.c", processor.signalPackages[0]);
+			assertEquals("d.e.f", processor.signalPackages[1]);
+			
+			processor.signalPackages = "a.b.c, d.e.f";
+			assertEquals(2, processor.signalPackages.length);
+			assertEquals("a.b.c", processor.signalPackages[0]);
+			assertEquals("d.e.f", processor.signalPackages[1]);
+		}
+				
+		private function createMetadataTag(args:Array, hostNode:XML):IMetadataTag {
 			var metadataTag:IMetadataTag = new BaseMetadataTag();
 			metadataTag.args = args;
-			metadataTag.host = new BaseMetadataHost();
-			metadataTag.host.name = DECORATED_LISTENER_NAME;
+			metadataTag.host = new MetadataHostMethod(hostNode);
+			metadataTag.host.name = String(hostNode.@name);
 			return metadataTag;
 		}
 	}

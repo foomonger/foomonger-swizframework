@@ -22,8 +22,11 @@ package com.foomonger.swizframework.processors {
 	import org.osflash.signals.ISignal;
 	import org.swizframework.core.Bean;
 	import org.swizframework.processors.BaseMetadataProcessor;
+	import org.swizframework.reflection.BaseMetadataTag;
 	import org.swizframework.reflection.IMetadataTag;
 	import org.swizframework.reflection.MetadataArg;
+	import org.swizframework.reflection.MetadataHostMethod;
+	import org.swizframework.reflection.MethodParameter;
 
 	/**
 	 * MediateSignalProcessor is the Signal version of MediateProcessor. After defining 
@@ -35,6 +38,20 @@ package com.foomonger.swizframework.processors {
 	public class MediateSignalProcessor extends BaseMetadataProcessor {
 
 		protected static const MEDIATE_SIGNAL:String = "MediateSignal";
+		
+		protected static const WILDCARD_PACKAGE:RegExp = /\A(.*)(\.\**)\Z/;
+
+		protected var _signalPackages:Array = [];
+
+		public var strictArgumentTypes:Boolean = false;
+	
+		public function get signalPackages():Array {
+			return _signalPackages;
+		}
+				
+		public function set signalPackages(value:*):void {
+			_signalPackages = parsePackageValue(value);
+		}
  
 		public function MediateSignalProcessor() {
 			super([MEDIATE_SIGNAL]);
@@ -44,7 +61,21 @@ package com.foomonger.swizframework.processors {
 			var signalBean:Bean = getSignalBean(metadataTag);
 			
 			if (signalBean) {
-				var listener:Function = bean.source[ metadataTag.host.name ];
+				var hostParameters:Array = (metadataTag.host as MetadataHostMethod).parameters;
+				var signalValueClasses:Array = (signalBean.source["valueClasses"] as Array)
+												? signalBean.source["valueClasses"] as Array
+												: [];
+				
+				if (!isValidHostArguments(hostParameters, signalValueClasses)) {
+					throw Error("Invalid Signal listener arguments: "
+									+ "Tag = " 
+									+ (metadataTag as BaseMetadataTag).asTag 
+									+ ", "
+									+ "Listener = "
+									+ metadataTag.host.name + "()");
+				}
+				
+				var listener:Function = bean.source[metadataTag.host.name];
 				
 				if (signalBean.source is ISignal) {
 					var signal:ISignal = signalBean.source as ISignal;
@@ -62,7 +93,7 @@ package com.foomonger.swizframework.processors {
 			var signalBean:Bean = getSignalBean(metadataTag);
 			
 			if (signalBean) {
-				var listener:Function = bean.source[ metadataTag.host.name ];
+				var listener:Function = bean.source[metadataTag.host.name];
 				
 				if (signalBean.source is ISignal) {
 					var signal:ISignal = signalBean.source as ISignal;
@@ -96,7 +127,12 @@ package com.foomonger.swizframework.processors {
 			if (signalBean == null) {
 				var typeArg:MetadataArg = metadataTag.getArg("type");
 				if (typeArg) {
-					var type:Class = getDefinitionByName(typeArg.value) as Class;
+					var type:Class;
+					if (signalPackages.length > 0) {
+						type = findClassDefinition(typeArg.value, signalPackages);
+					} else {
+						type = getClassDefinitionByName(typeArg.value) as Class;
+					}
 					if (type) {
 						signalBean = beanFactory.getBeanByType(type);
 					}
@@ -106,5 +142,86 @@ package com.foomonger.swizframework.processors {
 			return signalBean;
 		}
 		
+		private function isValidHostArguments(hostParameters:Array, signalValueClasses:Array):Boolean {
+			// Compare lengths
+			if (hostParameters.length != signalValueClasses.length) {
+				return false;
+			}
+			// If strict mode, then check types
+			if (strictArgumentTypes) {
+				hostParameters.sortOn("index", Array.NUMERIC);
+				var ilen:int = signalValueClasses.length;
+				var hostParameter:MethodParameter;
+				var signalValueClass:Class;
+				for (var i:int = 0; i < ilen; i++) {
+					signalValueClass = signalValueClasses[i] as Class;
+					hostParameter = hostParameters[i] as MethodParameter;
+					// It would be nice if this accounted for interface implementations
+					if (signalValueClass != hostParameter.type) {
+						return false;
+					}
+				}
+			}
+			
+			return true;
+		}
+		
+		/*
+		Parser method copied from SwizConfig so that logic is consitent with eventPackages.
+		*/
+		
+		private static function parsePackageValue(value:*):Array {
+			if (value == null) {
+				return [];
+			} else if (value is Array) {
+				return parsePackageNames(value as Array);
+			} else if (value is String) {
+				return parsePackageNames(value.replace( /\ /g, "" ).split( "," ));
+			} else {
+				throw new Error("Package specified using unknown type. Supported types are Array or String.");
+			}
+		}
+
+		private static function parsePackageNames( packageNames:Array):Array {
+			var parsedPackageNames:Array = [];
+			
+			for each(var packageName:String in packageNames) {
+				parsedPackageNames.push(parsePackageName(packageName));
+			}
+			
+			return parsedPackageNames;
+		}
+		
+		private static function parsePackageName(packageName:String):String {
+			var match:Object = WILDCARD_PACKAGE.exec(packageName);
+			if (match) {
+				return match[1];
+			}
+			return packageName;
+		}
+		
+		/*
+		Lookup logic copied from ClassConstant.
+		*/
+		private static function findClassDefinition(className:String, packageNames:Array):Class {
+			var definition:Class;
+			for each(var packageName:String in packageNames) {
+				definition = getClassDefinitionByName(packageName + "." + className) as Class;
+				if (definition != null) {
+					break;
+				}
+			}
+			return definition;
+		}
+		
+		private static function getClassDefinitionByName(className:String):Class {
+			var definition:Class;
+			try {
+				definition = getDefinitionByName(className) as Class;
+			} catch (e:Error) {
+				// Nothing
+			}
+			return definition;
+		}
 	}
 }
