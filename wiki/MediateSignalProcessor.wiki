@@ -1,20 +1,34 @@
 #summary Using the [MediateSignal] custom metadata tag
 
-!MediateSignalProcessor is the Signal version of !MediateProcessor. When you decorate a method with {{{[MediateSignal]}}} the processor will add it to a Signal Bean. You define which Signal Bean to use by:
+!MediateSignalProcessor is the Signal version of !MediateProcessor. It is used to automatically add listeners to your Signal Beans.
+
+Usage:
+
+ # Add {{{[MediateSignal]}}} to the list of metadata tags to keep when compiling 
+ # Add !MediateSignalProcessor to the Swiz instance
+ # Decorate methods with {{{[MediateSignal]}}} (with appropriate properties). The processor will add the method to a Signal Bean. 
+
+{{{[MediateSignal]}}} Options:
+
+You define which Signal Bean to use by:
 
 Bean name. E.g. 
  {{{[MediateSignal(bean="mySignalBeanName")]}}}
-
+ 
  "bean" is the default property so the above is the same as:
 
  {{{[MediateSignal("mySignalBeanName")]}}}
-
 Bean type. E.g.
  {{{[MediateSignal(type="com.foomonger.signals.UpdateBarSignal")]}}}
-  
+
  This is useful when subclassing Signals.
 
-You may also use !DeluxeSignals and define the priority. E.g.
+ You can define {{{signalPackages}}} on the processor instance just like  {{{eventPackages}}} on !SwizConfig. E.g.
+   Processor:
+    {{{<processors:MediateSignalProcessor signalPackages="com.foomonger.signals"/>}}}
+   Metadata:
+    {{{[MediateSignal(type="UpdateBarSignal")]}}} 
+ The processor always compares the listener's argument length with the Signal's valueClasses. It will throw an error if the lengths do not match. The processor will also strictly compare the argument types if you set {{{strictArgumentTypes =  true}}}. E.g.
+    {{{<processors:MediateSignalProcessor strictArgumentTypes="true"/>}}}
+You may also use !DeluxeSignals and define the priority. E.g. 
  {{{[MediateSignal(bean="myDeluxeSignalBean", priority="2")]}}}
-
-Don't forget to add {{{[MediateSignal]}}} to the list of metadata tags to keep when compiling and also to add !MediateSignalProcessor to the Swiz instance.
