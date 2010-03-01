@@ -28,7 +28,7 @@ Bean type. E.g.
     {{{<processors:MediateSignalProcessor signalPackages="com.foomonger.signals"/>}}}
    Metadata:
     {{{[MediateSignal(type="UpdateBarSignal")]}}} 
- The processor always compares the listener's argument length with the Signal's valueClasses. It will throw an error if the lengths do not match. The processor will also strictly compare the argument types if you set {{{strictArgumentTypes =  true}}}. E.g.
-    {{{<processors:MediateSignalProcessor strictArgumentTypes="true"/>}}}
+The processor always compares the listener's argument length with the Signal's valueClasses. It will throw an error if the lengths do not match. The processor will also strictly compare the argument types if you set {{{strictArgumentTypes =  true}}}. E.g.
+ {{{<processors:MediateSignalProcessor strictArgumentTypes="true"/>}}}
 You may also use !DeluxeSignals and define the priority. E.g. 
  {{{[MediateSignal(bean="myDeluxeSignalBean", priority="2")]}}}
