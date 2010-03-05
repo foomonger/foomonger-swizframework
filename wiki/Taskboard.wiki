@@ -1,0 +1,11 @@
+#summary To do, in progress, done
+
+== To Do ==
+ * Include `[!MediateTag]` into SWC
+ * Create example project for `[MediateTag]`
+ * Create `[BindToResource]` processor
+ * Create example project for `[BindToResource]`
+
+== In Progress ==
+
+== Done ==
