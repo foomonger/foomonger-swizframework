@@ -1,0 +1,17 @@
+#summary Version change summary
+
+----
+v1.1.0
+
+Added signalPackages property which acts just like !SwizConfig.eventPackages.
+
+Added strictArgumentTypes property. If true, listener arguments are checked against Signal valueClasses.
+
+----
+v1.0.0
+
+First release. 
+
+Supports looking up Signal by Bean name and type.
+
+----
