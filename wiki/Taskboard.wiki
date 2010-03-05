@@ -1,6 +1,7 @@
 #summary To do, in progress, done
 
 == To Do ==
+ * Log warning and errors in !MediateSignalProcessor
  * Include `[!MediateTag]` into SWC
  * Create example project for `[MediateTag]`
  * Create `[BindToResource]` processor
