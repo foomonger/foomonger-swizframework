@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<swiz:Swiz
+		xmlns:swiz="http://swiz.swizframework.org"
+		xmlns:processors="com.foomonger.swizframework.processors.*"
+		xmlns:model="example.model.*"
+		xmlns:signals="example.signals.*"
+		xmlns:view="example.view.*">
+	<swiz:config>
+		<swiz:SwizConfig viewPackages="example.view"/>
+	</swiz:config>
+	<swiz:beanProviders>
+		<swiz:BeanProvider>
+			<swiz:beans>
+				<model:InputViewModel/>
+				<model:OutputViewModel/>
+				<signals:ClickedSignal/>
+			</swiz:beans>
+		</swiz:BeanProvider>
+	</swiz:beanProviders>
+	<swiz:customProcessors>
+		<processors:MediateSignalProcessor 
+				signalPackages="example.signals" 
+				strictArgumentTypes="true"/>
+	</swiz:customProcessors>
+</swiz:Swiz>
