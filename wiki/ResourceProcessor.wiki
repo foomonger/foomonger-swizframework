@@ -1,4 +1,5 @@
 #summary Using the [Resource] custom metadata tag (v1.2.0)
+#labels Featured
 
 !ResourceProcessor binds a resource from the !ResourceManager singleton to the decorated property. It uses the IResource.getObject() method when binding so you can decorate properties of types supported by !ResourceManager.
 
