@@ -1,11 +1,11 @@
-#summary Using the [MediateSignal] custom metadata tag (v1.1.0)
+#summary Using the [MediateSignal] custom metadata tag (v1.2.0)
 #labels Featured,Phase-Deploy
 
 !MediateSignalProcessor is the Signal version of !MediateProcessor. It is used to automatically add listeners to your Signal Beans.
 
 Usage:
 
- # Add {{{[MediateSignal]}}} to the list of metadata tags to keep when compiling 
+ # Add {{{[MediateSignal]}}} to the list of metadata tags to keep when compiling. The `MediateSignal` tag is included in the SWC as of v1.2.0.
  # Add !MediateSignalProcessor to the Swiz instance
  # Decorate methods with {{{[MediateSignal]}}} (with appropriate properties). The processor will add the method to a Signal Bean. 
 
