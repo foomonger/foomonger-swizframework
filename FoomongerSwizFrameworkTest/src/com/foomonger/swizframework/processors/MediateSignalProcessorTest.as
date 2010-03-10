@@ -6,8 +6,9 @@ package com.foomonger.swizframework.processors {
 	import flash.utils.describeType;
 	import flash.utils.getQualifiedClassName;
 	
-	import flexunit.framework.AssertionFailedError;
 	import flexunit.framework.TestCase;
+	
+	import mx.logging.MockLogger;
 	
 	import org.osflash.signals.MockDeluxeSignal;
 	import org.osflash.signals.MockSignal;
@@ -27,6 +28,7 @@ package com.foomonger.swizframework.processors {
 		
 		private static const SIGNAL_BEAN_NAME:String = "signalBean";
 		private static const DELUXE_SIGNAL_BEAN_NAME:String = "deluxeSignalBean";
+		private static const NON_SIGNAL_BEAN_NAME:String = "nonSignalBean";
 		private static const DECORATED_LISTENER_NAME:String = "listener";
 		private static const SIGNAL_CLASS_PACKAGE:String = "org.osflash.signals";
 		private static const SIGNAL_CLASS_NAME:String = "MockSignal";
@@ -36,6 +38,7 @@ package com.foomonger.swizframework.processors {
 		private var beanProvider:IBeanProvider;
 		private var signalBean:Bean;
 		private var deluxeSignalBean:Bean;
+		private var nonSignalBean:Bean;
 		private var decoratedBean:Bean;
 		private var signal:MockSignal;
 		private var deluxeSignal:MockDeluxeSignal;
@@ -60,11 +63,14 @@ package com.foomonger.swizframework.processors {
 			signalBean = new Bean(signal, SIGNAL_BEAN_NAME, new TypeDescriptor().fromXML(describeType(signal)));
 			signalBean.source = signal;
 			deluxeSignalBean = new Bean(deluxeSignal, DELUXE_SIGNAL_BEAN_NAME, new TypeDescriptor().fromXML(describeType(deluxeSignal)));
+			var obj:Object = new Object();
+			nonSignalBean = new Bean(obj, NON_SIGNAL_BEAN_NAME, new TypeDescriptor().fromXML(describeType(obj)));
 			decoratedBean = new Bean(decoratedBeanSource, "mock", new TypeDescriptor().fromXML(describeType(decoratedBeanSource)));
 			
 			beanProvider = new BeanProvider();
 			beanProvider.addBean(signalBean);
 			beanProvider.addBean(deluxeSignalBean);
+			beanProvider.addBean(nonSignalBean);
 			beanProvider.addBean(decoratedBean);
 			
 			processor = new MediateSignalProcessor();
@@ -73,6 +79,30 @@ package com.foomonger.swizframework.processors {
 			swiz.init();
 			
 			processor.init(swiz);
+		}
+		
+		public function test_setUpMetadataTag_beanNotFoundError():void {
+			var defaultArg:MetadataArg = new MetadataArg("", "thisBeanDoesntExist");
+			var metadataTag:IMetadataTag = createMetadataTag([defaultArg], listenerHostNode);
+			signal.mock.method("add").never;
+			var logger:MockLogger = new MockLogger();
+			logger.mock.method("error").withAnyArgs.once;
+			processor.logger = logger;
+			processor.setUpMetadataTag(metadataTag, decoratedBean);
+			logger.mock.verify();
+			signal.mock.verify();
+		}
+		
+		public function test_setUpMetadataTag_nonSignalBeanError():void {
+			var defaultArg:MetadataArg = new MetadataArg("", NON_SIGNAL_BEAN_NAME);
+			var metadataTag:IMetadataTag = createMetadataTag([defaultArg], listenerHostNode);
+			signal.mock.method("add").never;
+			var logger:MockLogger = new MockLogger();
+			logger.mock.method("error").withAnyArgs.once;
+			processor.logger = logger;
+			processor.setUpMetadataTag(metadataTag, decoratedBean);
+			logger.mock.verify();
+			signal.mock.verify();
 		}
 				
 		public function test_setUpMetadataTag_signal_byBeanName_defaultProperty():void {
@@ -181,15 +211,11 @@ package com.foomonger.swizframework.processors {
 			var metadataTag:IMetadataTag = createMetadataTag([defaultArg], invalidListenerHostNode);
 			signal.mock.property("valueClasses").returns([String]);
 			signal.mock.method("add").never;
-		 	try {
-		 		processor.setUpMetadataTag(metadataTag, decoratedBean);
-		    	// We expect an error
-		    	fail("Argument validation failed");
-			} catch (error:Error) {
-				if (error is AssertionFailedError) {
-            		throw error;
-        		}
-			}
+			var logger:MockLogger = new MockLogger();
+			logger.mock.method("error").withAnyArgs.once;
+			processor.logger = logger;
+	 		processor.setUpMetadataTag(metadataTag, decoratedBean);
+			logger.mock.verify();
 			signal.mock.verify();
 		}
 		
@@ -216,15 +242,11 @@ package com.foomonger.swizframework.processors {
 			signal.mock.property("valueClasses").returns([String, String]);
 			signal.mock.method("add").never;
 			processor.strictArgumentTypes = true;
-	 		try {
-		 		processor.setUpMetadataTag(metadataTag, decoratedBean);
-		    	// We expect an error
-		    	fail("Argument validation failed");
-			} catch (error:Error) {
-				if (error is AssertionFailedError) {
-            		throw error;
-        		}
-			}
+			var logger:MockLogger = new MockLogger();
+			logger.mock.method("error").withAnyArgs.once;
+	 		processor.logger = logger;
+	 		processor.setUpMetadataTag(metadataTag, decoratedBean);
+			logger.mock.verify();
 			signal.mock.verify();
 		}
 		
