@@ -7,6 +7,7 @@
 		creationComplete="creationCompleteHandler(event)">
 	<mx:Script>
 		<![CDATA[
+			import com.foomonger.swizframework.processors.ResourceProcessorTest;
 			import com.foomonger.swizframework.processors.MediateSignalProcessorTest;
 			
 			import flexunit.framework.TestSuite;
@@ -14,6 +15,7 @@
 			private function creationCompleteHandler(event:Event):void {
 				var suite:TestSuite = new TestSuite();
 				
+				suite.addTestSuite(ResourceProcessorTest);
 				suite.addTestSuite(MediateSignalProcessorTest);
 				
 				testRunner.test = suite;
