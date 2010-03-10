@@ -18,6 +18,8 @@ package com.foomonger.swizframework.processors {
 
 	import flash.utils.getDefinitionByName;
 	
+	import mx.logging.ILogger;
+	
 	import org.osflash.signals.IDeluxeSignal;
 	import org.osflash.signals.ISignal;
 	import org.swizframework.core.Bean;
@@ -27,6 +29,7 @@ package com.foomonger.swizframework.processors {
 	import org.swizframework.reflection.MetadataArg;
 	import org.swizframework.reflection.MetadataHostMethod;
 	import org.swizframework.reflection.MethodParameter;
+	import org.swizframework.utils.SwizLogger;
 
 	/**
 	 * MediateSignalProcessor is the Signal version of MediateProcessor. After defining 
@@ -40,7 +43,9 @@ package com.foomonger.swizframework.processors {
 		protected static const MEDIATE_SIGNAL:String = "MediateSignal";
 		
 		protected static const WILDCARD_PACKAGE:RegExp = /\A(.*)(\.\**)\Z/;
-
+		
+		internal var logger:ILogger = SwizLogger.getLogger(this);
+		
 		protected var _signalPackages:Array = [];
 
 		public var strictArgumentTypes:Boolean = false;
@@ -60,32 +65,34 @@ package com.foomonger.swizframework.processors {
 		override public function setUpMetadataTag(metadataTag:IMetadataTag, bean:Bean):void {
 			var signalBean:Bean = getSignalBean(metadataTag);
 			
-			if (signalBean) {
-				var hostParameters:Array = (metadataTag.host as MetadataHostMethod).parameters;
-				var signalValueClasses:Array = (signalBean.source["valueClasses"] as Array)
-												? signalBean.source["valueClasses"] as Array
-												: [];
-				
-				if (!isValidHostArguments(hostParameters, signalValueClasses)) {
-					throw Error("Invalid Signal listener arguments: "
-									+ "Tag = " 
-									+ (metadataTag as BaseMetadataTag).asTag 
-									+ ", "
-									+ "Listener = "
-									+ metadataTag.host.name + "()");
-				}
-				
-				var listener:Function = bean.source[metadataTag.host.name];
-				
-				if (signalBean.source is ISignal) {
-					var signal:ISignal = signalBean.source as ISignal;
-					signal.add(listener);
-				} else if (signalBean.source is IDeluxeSignal) {
-					var deluxeSignal:IDeluxeSignal = signalBean.source as IDeluxeSignal;
-					var priorityArg:MetadataArg = metadataTag.getArg("priority");
-					var priority:int = priorityArg ? int(priorityArg.value) : 0; 
-					deluxeSignal.add(listener, priority);
-				}
+			if (signalBean == null) {
+				logger.error("[MediateSignalProcessor] Bean not found for tag {0}", (metadataTag as BaseMetadataTag).asTag);
+				return;
+			}
+			if (!(signalBean.source is ISignal) && !(signalBean.source is IDeluxeSignal)) {
+				logger.error("[MediateSignalProcessor] Bean source is not a Signal for tag {0}", (metadataTag as BaseMetadataTag).asTag);
+				return;
+			}
+			var hostParameters:Array = (metadataTag.host as MetadataHostMethod).parameters;
+			var signalValueClasses:Array = (signalBean.source["valueClasses"] as Array)
+											? signalBean.source["valueClasses"] as Array
+											: [];
+			
+			if (!isValidHostArguments(hostParameters, signalValueClasses)) {
+				logger.error("[MediateSignalProcessor] Invalid Signal listener arguments. {0}.{1}()", String(bean.source), metadataTag.host.name);
+				return;
+			}
+			
+			var listener:Function = bean.source[metadataTag.host.name];
+			
+			if (signalBean.source is ISignal) {
+				var signal:ISignal = signalBean.source as ISignal;
+				signal.add(listener);
+			} else if (signalBean.source is IDeluxeSignal) {
+				var deluxeSignal:IDeluxeSignal = signalBean.source as IDeluxeSignal;
+				var priorityArg:MetadataArg = metadataTag.getArg("priority");
+				var priority:int = priorityArg ? int(priorityArg.value) : 0; 
+				deluxeSignal.add(listener, priority);
 			}
 		}
 						
