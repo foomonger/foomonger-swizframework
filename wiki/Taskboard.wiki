@@ -1,12 +1,12 @@
 #summary To do, in progress, done
 
 == To Do ==
+
+== In Progress ==
+
+== Done ==
  * Log warnings and errors in !MediateSignalProcessor
  * Include `[MediateTag]` into SWC
  * Create example project for `[MediateTag]`
  * Create `[Resource]` processor
  * Create example project for `[Resource]`
-
-== In Progress ==
-
-== Done ==
