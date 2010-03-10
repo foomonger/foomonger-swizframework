@@ -1,6 +1,8 @@
 #summary To do, in progress, done
 
 == To Do ==
+ * Improve comments. Include examples for asdocs.
+ * Create build scripts.
 
 == In Progress ==
 
