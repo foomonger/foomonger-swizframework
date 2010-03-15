@@ -1,7 +1,7 @@
 #summary To do, in progress, done
 
 == To Do ==
- * Create BaseMetadataTag subclasses for processors.
+ * Create !BaseMetadataTag subclasses for processors.
  * Improve comments. Include examples for asdocs.
  * Create build scripts.
 
