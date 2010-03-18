@@ -4,6 +4,7 @@
  * Create !BaseMetadataTag subclasses for processors.
  * Improve comments. Include examples for asdocs.
  * Create build scripts.
+ * Consider command pattern helper feature for !MediateSignalProcessor
 
 == In Progress ==
 
