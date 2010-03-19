@@ -2,8 +2,8 @@
 
 == To Do ==
  * Create !LoggerProcessor
-  * Use SwizLogger
-  * Provide way to override logger creation: createLogger(clazz:Class):ILogger
+  * Use !SwizLogger
+  * Provide way to override logger creation: createLogger(clazz:Class):!ILogger
   * Externalized targets
  * Create !BaseMetadataTag subclasses for processors.
  * Improve comments. Include examples for asdocs.
