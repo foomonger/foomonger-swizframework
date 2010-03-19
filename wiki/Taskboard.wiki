@@ -1,6 +1,10 @@
 #summary To do, in progress, done
 
 == To Do ==
+ * Create !LoggerProcessor
+  * Use SwizLogger
+  * Provide way to override logger creation: createLogger(clazz:Class):ILogger
+  * Externalized targets
  * Create !BaseMetadataTag subclasses for processors.
  * Improve comments. Include examples for asdocs.
  * Create build scripts.
