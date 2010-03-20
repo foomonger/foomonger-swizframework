@@ -1,4 +1,4 @@
-#summary Using the [MediateSignal] custom metadata tag (v1.2.0)
+#summary Using the [MediateSignal] custom metadata tag (v1.3.0)
 #labels Featured
 
 !MediateSignalProcessor is the Signal version of !MediateProcessor. It is used to automatically add listeners to your Signal Beans.
