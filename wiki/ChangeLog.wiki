@@ -2,6 +2,13 @@
 #labels Featured
 
 ----
+v1.3.0
+
+Created !SwizLoggerConfig with example project.
+
+Created !LoggerProcessor with example project (same as !SwizLoggerConfig).
+
+----
 v1.2.0
 
 Created !ResourceProcessor with tests and example project.
