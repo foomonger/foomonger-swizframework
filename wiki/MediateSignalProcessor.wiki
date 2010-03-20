@@ -3,6 +3,8 @@
 
 !MediateSignalProcessor is the Signal version of !MediateProcessor. It is used to automatically add listeners to your Signal Beans.
 
+Example [http://www.foomonger.com/swizframework/MediateSignalProcessorExample/MediateSignalProcessorExample.swf SWF] and [http://www.foomonger.com/swizframework/MediateSignalProcessorExample/srcview/ Source].
+
 Usage:
 
  # If using the source directly, add `MediateSignal` to the list of metadata tags to keep when compiling. The `MediateSignal` tag is included in the SWC as of v1.2.0.
