@@ -1,0 +1,15 @@
+#summary Using the [Logger] custom metadata tag (v1.3.0)
+
+Example [http://www.foomonger.com/swizframework/SwizLoggerConfigExample/SwizLoggerConfigExample.swf SWF] and [http://www.foomonger.com/swizframework/SwizLoggerConfigExample/srcview/ Source].
+
+!LoggerProcessor injects an ILogger instance to the decorated property using the Bean source as the ILogger target using the !SwizLogger. It's processor priority is 1 above the `[Inject]` priority so the logger instance will be availble at `[Inject]` and `[PostConstruct]`.
+
+This processor doesn't really do much but works well when used with SwizLoggerConfig.
+
+Usage:
+
+ # If using the source directly, add `Logger` to the list of metadata tags to keep when compiling. The `Logger` tag is included in the SWC as of v1.3.0.
+ # Add !LoggerProcessor to the Swiz instance
+ # Decorate properties of type ILogger with `[Logger]`. E.g.  
+  `[Logger]`
+  `public var logger:ILogger;`
