@@ -1,4 +1,5 @@
 #summary Using the !SwizLoggerConfig (v1.3.0)
+#labels Featured
 
 Example [http://www.foomonger.com/swizframework/SwizLoggerConfigExample/SwizLoggerConfigExample.swf SWF] and [http://www.foomonger.com/swizframework/SwizLoggerConfigExample/srcview/ Source].
 
