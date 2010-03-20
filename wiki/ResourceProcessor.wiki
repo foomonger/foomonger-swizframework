@@ -1,5 +1,7 @@
-#summary Using the [Resource] custom metadata tag (v1.2.0)
+#summary Using the [Resource] custom metadata tag (v1.3.0)
 #labels Featured
+
+Example [http://www.foomonger.com/swizframework/ResourceProcessor Example/ResourceProcessor Example.swf SWF] and [http://www.foomonger.com/swizframework/ResourceProcessor Example/srcview/ Source].
 
 !ResourceProcessor binds a resource from the !ResourceManager singleton to the decorated property. It uses the IResource.getObject() method when binding so you can decorate properties of types supported by !ResourceManager.
 
