@@ -2,7 +2,8 @@
 <mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" 
 		xmlns:utils="com.foomonger.swizframework.utils.*"
 		xmlns:view="example.view.*"
-		layout="absolute" xmlns:local="*">
+		xmlns:local="*"
+		layout="absolute">
 	<mx:Script>
 		<![CDATA[
 			import mx.logging.LogEventLevel;
