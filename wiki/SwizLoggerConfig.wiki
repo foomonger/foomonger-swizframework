@@ -2,7 +2,7 @@
 
 Example [http://www.foomonger.com/swizframework/SwizLoggerConfigExample/SwizLoggerConfigExample.swf SWF] and [http://www.foomonger.com/swizframework/SwizLoggerConfigExample/srcview/ Source].
 
-SwizLoggerConfig is a helper class that makes it easy to declare logging targets in MXML. If you're creating a non-Flex application then yoou should use SwizLogger directly. 
+SwizLoggerConfig is a helper class that makes it easy to declare logging targets in MXML. If you're creating a non-Flex application then yoou should use !SwizLogger directly. 
 
 Example:
 {{{
