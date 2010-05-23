@@ -16,3 +16,5 @@
  * Create example project for `[Resource]`
  * Create !SwizLoggerConfig
  * Create !LoggerProcessor
+ * Removed !SwizLoggerConfig as of 1.4.0
+ * Updated to work with Swiz 1.0.0 RC1
