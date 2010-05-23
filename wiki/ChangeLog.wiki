@@ -2,6 +2,13 @@
 #labels Featured
 
 ----
+v1.4.0
+
+Updated to work with Swiz 1.0.0 RC1
+
+Removed !SwizLoggerConfig.
+
+----
 v1.3.0
 
 Created !SwizLoggerConfig with example project.
