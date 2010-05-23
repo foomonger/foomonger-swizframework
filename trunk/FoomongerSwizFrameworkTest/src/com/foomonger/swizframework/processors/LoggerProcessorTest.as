@@ -1,12 +1,10 @@
 package com.foomonger.swizframework.processors {
 	
 	import flash.events.EventDispatcher;
+	import flash.system.ApplicationDomain;
 	import flash.utils.describeType;
 	
 	import flexunit.framework.TestCase;
-	
-	import mx.logging.ILogger;
-	import mx.logging.MockLogger;
 	
 	import org.swizframework.core.Bean;
 	import org.swizframework.core.BeanProvider;
@@ -14,10 +12,11 @@ package com.foomonger.swizframework.processors {
 	import org.swizframework.core.ISwiz;
 	import org.swizframework.core.Swiz;
 	import org.swizframework.core.SwizConfig;
+	import org.swizframework.factories.MetadataHostFactory;
 	import org.swizframework.reflection.BaseMetadataTag;
 	import org.swizframework.reflection.IMetadataTag;
-	import org.swizframework.reflection.MetadataHostProperty;
 	import org.swizframework.reflection.TypeDescriptor;
+	import org.swizframework.utils.logging.SwizLogger;
 	
 	public class LoggerProcessorTest extends TestCase {
 		
@@ -32,13 +31,13 @@ package com.foomonger.swizframework.processors {
 		
 		public function LoggerProcessorTest(methodName:String=null) {
 			super(methodName);
-			propertyHostNode = <variable name={HOST_NAME} type="mx.logging::ILogger"/>;
+			propertyHostNode = <variable name={HOST_NAME} type="org.swizframework.utils.logging::SwizLogger"/>;
 
 		}
 		
 		override public function setUp():void {
 			decoratedBeanSource = new Object();
-			decoratedBean = new Bean(decoratedBeanSource, "beanSource", new TypeDescriptor().fromXML(describeType(decoratedBeanSource)));
+			decoratedBean = new Bean(decoratedBeanSource, "beanSource", new TypeDescriptor().fromXML(describeType(decoratedBeanSource), ApplicationDomain.currentDomain));
 			beanProvider = new BeanProvider();
 			beanProvider.addBean(decoratedBean);
 			processor = new LoggerProcessor();
@@ -53,9 +52,9 @@ package com.foomonger.swizframework.processors {
 			assertNull(decoratedBeanSource[HOST_NAME]);
 			// Set up
 			processor.setUpMetadataTag(metadataTag, decoratedBean);
-			// Property should be an ILogger
+			// Property should be a SwizLogger
 			assertNotNull(decoratedBeanSource[HOST_NAME]);
-			assertTrue(decoratedBeanSource[HOST_NAME] is ILogger);
+			assertTrue(decoratedBeanSource[HOST_NAME] is SwizLogger);
 			// Tear down
 			processor.tearDownMetadataTag(metadataTag, decoratedBean);
 			// Now it should be null
@@ -65,8 +64,8 @@ package com.foomonger.swizframework.processors {
 		private function createMetadataTag(args:Array, hostNode:XML):IMetadataTag {
 			var metadataTag:IMetadataTag = new BaseMetadataTag();
 			metadataTag.args = args;
-			metadataTag.host = new MetadataHostProperty(hostNode);
-			metadataTag.host.name = String(hostNode.@name);
+			var factory:MetadataHostFactory = new MetadataHostFactory(ApplicationDomain.currentDomain);
+			metadataTag.host = factory.getMetadataHost(hostNode);
 			return metadataTag;
 		}
 	}

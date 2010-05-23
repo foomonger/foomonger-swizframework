@@ -1,11 +1,11 @@
 package com.foomonger.swizframework.processors {
 	
 	import flash.events.EventDispatcher;
+	import flash.system.ApplicationDomain;
 	import flash.utils.describeType;
 	
 	import flexunit.framework.TestCase;
 	
-	import mx.logging.MockLogger;
 	import mx.resources.IResourceBundle;
 	import mx.resources.IResourceManager;
 	import mx.resources.ResourceBundle;
@@ -17,11 +17,12 @@ package com.foomonger.swizframework.processors {
 	import org.swizframework.core.ISwiz;
 	import org.swizframework.core.Swiz;
 	import org.swizframework.core.SwizConfig;
+	import org.swizframework.factories.MetadataHostFactory;
 	import org.swizframework.reflection.BaseMetadataTag;
 	import org.swizframework.reflection.IMetadataTag;
 	import org.swizframework.reflection.MetadataArg;
-	import org.swizframework.reflection.MetadataHostProperty;
 	import org.swizframework.reflection.TypeDescriptor;
+	import org.swizframework.utils.logging.MockSwizLogger;
 	
 	public class ResourceProcessorTest extends TestCase {
 		
@@ -58,7 +59,7 @@ package com.foomonger.swizframework.processors {
 			resourceManager.addResourceBundle(resourceBundle);
 			resourceManager.addResourceBundle(resourceBundle2);
 			decoratedBeanSource = new Object();
-			decoratedBean = new Bean(decoratedBeanSource, "beanSource", new TypeDescriptor().fromXML(describeType(decoratedBeanSource)));
+			decoratedBean = new Bean(decoratedBeanSource, "beanSource", new TypeDescriptor().fromXML(describeType(decoratedBeanSource), ApplicationDomain.currentDomain));
 			beanProvider = new BeanProvider();
 			beanProvider.addBean(decoratedBean);
 			processor = new ResourceProcessor();
@@ -93,7 +94,7 @@ package com.foomonger.swizframework.processors {
 		
 		public function test_setUp_propertiesError():void {
 			var metadataTag:IMetadataTag = createMetadataTag([], propertyHostNode);
-			var logger:MockLogger = new MockLogger();
+			var logger:MockSwizLogger = new MockSwizLogger("mock");
 			logger.mock.method("error").withAnyArgs.once;
 			processor.logger = logger;
 			processor.setUpMetadataTag(metadataTag, decoratedBean);
@@ -103,8 +104,8 @@ package com.foomonger.swizframework.processors {
 		private function createMetadataTag(args:Array, hostNode:XML):IMetadataTag {
 			var metadataTag:IMetadataTag = new BaseMetadataTag();
 			metadataTag.args = args;
-			metadataTag.host = new MetadataHostProperty(hostNode);
-			metadataTag.host.name = String(hostNode.@name);
+			var factory:MetadataHostFactory = new MetadataHostFactory(ApplicationDomain.currentDomain);
+			metadataTag.host = factory.getMetadataHost(hostNode);
 			return metadataTag;
 		}
 	}

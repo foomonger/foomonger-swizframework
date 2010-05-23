@@ -2,22 +2,7 @@
 <mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" 
 		xmlns:local="*"
 		xmlns:view="example.view.*"
-		layout="vertical"
-		preinitialize="preinitializeHandler(event)" viewSourceURL="srcview/index.html">
-	<mx:Script>
-		<![CDATA[
-			import mx.logging.targets.TraceTarget;
-			import org.swizframework.utils.SwizLogger;
-			
-			private var traceTarget:TraceTarget;
-			
-			private function preinitializeHandler(event:Event):void {
-				traceTarget = new TraceTarget();
-				traceTarget.filters = ["com.foomonger.swizframework.processors.*"];
-				SwizLogger.addLoggingTarget(traceTarget);
-			}
-		]]>
-	</mx:Script>
+		layout="vertical">
 	<local:ResourceProcessorExampleSwiz/>
 	<view:MainView/>
 </mx:Application>

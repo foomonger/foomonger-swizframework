@@ -3,12 +3,11 @@ package com.foomonger.swizframework.processors {
 	import com.anywebcam.mock.Mock;
 	
 	import flash.events.EventDispatcher;
+	import flash.system.ApplicationDomain;
 	import flash.utils.describeType;
 	import flash.utils.getQualifiedClassName;
 	
 	import flexunit.framework.TestCase;
-	
-	import mx.logging.MockLogger;
 	
 	import org.osflash.signals.MockDeluxeSignal;
 	import org.osflash.signals.MockSignal;
@@ -18,11 +17,12 @@ package com.foomonger.swizframework.processors {
 	import org.swizframework.core.ISwiz;
 	import org.swizframework.core.Swiz;
 	import org.swizframework.core.SwizConfig;
+	import org.swizframework.factories.MetadataHostFactory;
 	import org.swizframework.reflection.BaseMetadataTag;
 	import org.swizframework.reflection.IMetadataTag;
 	import org.swizframework.reflection.MetadataArg;
-	import org.swizframework.reflection.MetadataHostMethod;
 	import org.swizframework.reflection.TypeDescriptor;
+	import org.swizframework.utils.logging.MockSwizLogger;
 	
 	public class MediateSignalProcessorTest extends TestCase {
 		
@@ -60,12 +60,12 @@ package com.foomonger.swizframework.processors {
 								.returns(function():void{});
 			listener = decoratedBeanSource[DECORATED_LISTENER_NAME];
 			
-			signalBean = new Bean(signal, SIGNAL_BEAN_NAME, new TypeDescriptor().fromXML(describeType(signal)));
+			signalBean = new Bean(signal, SIGNAL_BEAN_NAME, new TypeDescriptor().fromXML(describeType(signal), ApplicationDomain.currentDomain));
 			signalBean.source = signal;
-			deluxeSignalBean = new Bean(deluxeSignal, DELUXE_SIGNAL_BEAN_NAME, new TypeDescriptor().fromXML(describeType(deluxeSignal)));
+			deluxeSignalBean = new Bean(deluxeSignal, DELUXE_SIGNAL_BEAN_NAME, new TypeDescriptor().fromXML(describeType(deluxeSignal), ApplicationDomain.currentDomain));
 			var obj:Object = new Object();
-			nonSignalBean = new Bean(obj, NON_SIGNAL_BEAN_NAME, new TypeDescriptor().fromXML(describeType(obj)));
-			decoratedBean = new Bean(decoratedBeanSource, "mock", new TypeDescriptor().fromXML(describeType(decoratedBeanSource)));
+			nonSignalBean = new Bean(obj, NON_SIGNAL_BEAN_NAME, new TypeDescriptor().fromXML(describeType(obj), ApplicationDomain.currentDomain));
+			decoratedBean = new Bean(decoratedBeanSource, "mock", new TypeDescriptor().fromXML(describeType(decoratedBeanSource), ApplicationDomain.currentDomain));
 			
 			beanProvider = new BeanProvider();
 			beanProvider.addBean(signalBean);
@@ -85,7 +85,7 @@ package com.foomonger.swizframework.processors {
 			var defaultArg:MetadataArg = new MetadataArg("", "thisBeanDoesntExist");
 			var metadataTag:IMetadataTag = createMetadataTag([defaultArg], listenerHostNode);
 			signal.mock.method("add").never;
-			var logger:MockLogger = new MockLogger();
+			var logger:MockSwizLogger = new MockSwizLogger("mock");
 			logger.mock.method("error").withAnyArgs.once;
 			processor.logger = logger;
 			processor.setUpMetadataTag(metadataTag, decoratedBean);
@@ -97,7 +97,7 @@ package com.foomonger.swizframework.processors {
 			var defaultArg:MetadataArg = new MetadataArg("", NON_SIGNAL_BEAN_NAME);
 			var metadataTag:IMetadataTag = createMetadataTag([defaultArg], listenerHostNode);
 			signal.mock.method("add").never;
-			var logger:MockLogger = new MockLogger();
+			var logger:MockSwizLogger = new MockSwizLogger("mock");
 			logger.mock.method("error").withAnyArgs.once;
 			processor.logger = logger;
 			processor.setUpMetadataTag(metadataTag, decoratedBean);
@@ -211,7 +211,7 @@ package com.foomonger.swizframework.processors {
 			var metadataTag:IMetadataTag = createMetadataTag([defaultArg], invalidListenerHostNode);
 			signal.mock.property("valueClasses").returns([String]);
 			signal.mock.method("add").never;
-			var logger:MockLogger = new MockLogger();
+			var logger:MockSwizLogger = new MockSwizLogger("mock");
 			logger.mock.method("error").withAnyArgs.once;
 			processor.logger = logger;
 	 		processor.setUpMetadataTag(metadataTag, decoratedBean);
@@ -242,7 +242,7 @@ package com.foomonger.swizframework.processors {
 			signal.mock.property("valueClasses").returns([String, String]);
 			signal.mock.method("add").never;
 			processor.strictArgumentTypes = true;
-			var logger:MockLogger = new MockLogger();
+			var logger:MockSwizLogger = new MockSwizLogger("mock");
 			logger.mock.method("error").withAnyArgs.once;
 	 		processor.logger = logger;
 	 		processor.setUpMetadataTag(metadataTag, decoratedBean);
@@ -269,8 +269,8 @@ package com.foomonger.swizframework.processors {
 		private function createMetadataTag(args:Array, hostNode:XML):IMetadataTag {
 			var metadataTag:IMetadataTag = new BaseMetadataTag();
 			metadataTag.args = args;
-			metadataTag.host = new MetadataHostMethod(hostNode);
-			metadataTag.host.name = String(hostNode.@name);
+			var factory:MetadataHostFactory = new MetadataHostFactory(ApplicationDomain.currentDomain);
+			metadataTag.host = factory.getMetadataHost(hostNode);
 			return metadataTag;
 		}
 	}
