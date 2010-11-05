@@ -4,5 +4,5 @@
 		xmlns:view="example.view.*"
 		layout="vertical" viewSourceURL="srcview/index.html">
 	<local:ResourceProcessorExampleSwiz/>
-	<view:MainViewAlt1/>
+	<view:MainView/>
 </mx:Application>
