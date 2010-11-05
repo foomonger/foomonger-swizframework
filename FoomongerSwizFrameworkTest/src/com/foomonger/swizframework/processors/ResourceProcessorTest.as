@@ -104,8 +104,7 @@ package com.foomonger.swizframework.processors {
 		private function createMetadataTag(args:Array, hostNode:XML):IMetadataTag {
 			var metadataTag:IMetadataTag = new BaseMetadataTag();
 			metadataTag.args = args;
-			var factory:MetadataHostFactory = new MetadataHostFactory(ApplicationDomain.currentDomain);
-			metadataTag.host = factory.getMetadataHost(hostNode);
+			metadataTag.host = MetadataHostFactory.getMetadataHost(hostNode, ApplicationDomain.currentDomain);
 			return metadataTag;
 		}
 	}
