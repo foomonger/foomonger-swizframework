@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Application 
+		xmlns:mx="http://www.adobe.com/2006/mxml" 
+		xmlns:flexui="flexunit.flexui.*"
+		layout="absolute"
+		width="1000" height="800"
+		creationComplete="creationCompleteHandler(event)">
+	<mx:Script>
+		<![CDATA[
+			import com.foomonger.swizframework.processors.LoggerProcessorTest;
+			import com.foomonger.swizframework.processors.ResourceProcessorTest;
+			import com.foomonger.swizframework.processors.SignalHandlerProcessorTest;
+			
+			import flexunit.framework.TestSuite;
+			
+			private function creationCompleteHandler(event:Event):void {
+				var suite:TestSuite = new TestSuite();
+				
+				suite.addTestSuite(LoggerProcessorTest);
+				suite.addTestSuite(ResourceProcessorTest);
+				suite.addTestSuite(SignalHandlerProcessorTest);
+				
+				testRunner.test = suite;
+				testRunner.startTest();
+			}
+		]]>
+	</mx:Script>
+	<flexui:TestRunnerBase id="testRunner" width="100%" height="100%" />
+</mx:Application>
