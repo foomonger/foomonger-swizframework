@@ -31,7 +31,7 @@ package com.foomonger.swizframework.processors {
 		protected static const LOGGER:String = "Logger";
 		
 		override public function get priority():int {
-			return ProcessorPriority.INJECT - 1;
+			return ProcessorPriority.INJECT + 1;
 		}
 		
 		public function LoggerProcessor() {
