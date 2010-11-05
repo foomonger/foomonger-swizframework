@@ -18,20 +18,16 @@ package org.osflash.signals {
 			return mock.numListeners;
 		}
 		
-		public function add(listener:Function):void {
-			mock.add(listener);
+		public function add(listener:Function):Function {
+			return mock.add(listener);
 		}
 		
-		public function addOnce(listener:Function):void {
-			mock.addOnce(listener);
+		public function addOnce(listener:Function):Function {
+			return mock.addOnce(listener);
 		}
 		
-		public function remove(listener:Function):void {
-			mock.remove(listener);
-		}
-		
-		public function removeAll():void {
-			mock.remoeAll();
+		public function remove(listener:Function):Function {
+			return mock.remove(listener);
 		}
 		
 	}

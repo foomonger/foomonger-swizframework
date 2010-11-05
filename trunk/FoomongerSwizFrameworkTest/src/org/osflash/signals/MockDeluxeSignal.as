@@ -2,7 +2,7 @@ package org.osflash.signals {
 	
 	import com.anywebcam.mock.Mock;
 	
-	public class MockDeluxeSignal implements IDeluxeSignal {
+	public class MockDeluxeSignal implements IPrioritySignal {
 		
 		public var mock:Mock;
 		
@@ -19,20 +19,24 @@ package org.osflash.signals {
 			return mock.numListeners;
 		}
 		
-		public function add(listener:Function, priority:int = 0):void {
-			mock.add(listener, priority);
+		public function add(listener:Function):Function {
+			return mock.add(listener);
 		}
 		
-		public function addOnce(listener:Function, priority:int = 0):void {
-			mock.addOnce(listener, priority);
+		public function addOnce(listener:Function):Function {
+			return mock.addOnce(listener);
 		}
 		
-		public function remove(listener:Function):void {
-			mock.remove(listener);
+		public function addWithPriority(listener:Function, priority:int = 0):Function {
+			return mock.addWithPriority(listener, priority);
 		}
 		
-		public function removeAll():void {
-			mock.removeAll();
+		public function addOnceWithPriority(listener:Function, priority:int = 0):Function {
+			return mock.addOnceWithPriority(listener, priority);
+		}
+		
+		public function remove(listener:Function):Function {
+			return mock.remove(listener);
 		}
 		
 	}

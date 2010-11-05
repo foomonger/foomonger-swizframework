@@ -24,7 +24,7 @@ package com.foomonger.swizframework.processors {
 	import org.swizframework.reflection.TypeDescriptor;
 	import org.swizframework.utils.logging.MockSwizLogger;
 	
-	public class MediateSignalProcessorTest extends TestCase {
+	public class SignalHandlerProcessorTest extends TestCase {
 		
 		private static const SIGNAL_BEAN_NAME:String = "signalBean";
 		private static const DELUXE_SIGNAL_BEAN_NAME:String = "deluxeSignalBean";
@@ -34,7 +34,7 @@ package com.foomonger.swizframework.processors {
 		private static const SIGNAL_CLASS_NAME:String = "MockSignal";
 		
 		private var swiz:ISwiz;
-		private var processor:MediateSignalProcessor;
+		private var processor:SignalHandlerProcessor;
 		private var beanProvider:IBeanProvider;
 		private var signalBean:Bean;
 		private var deluxeSignalBean:Bean;
@@ -46,7 +46,7 @@ package com.foomonger.swizframework.processors {
 		private var listener:Function;
 		private var listenerHostNode:XML;
 		
-		public function MediateSignalProcessorTest(methodName:String=null) {
+		public function SignalHandlerProcessorTest(methodName:String=null) {
 			super(methodName);
 			listenerHostNode = <method name={DECORATED_LISTENER_NAME} returnType="void"/>;
 		}
@@ -73,7 +73,7 @@ package com.foomonger.swizframework.processors {
 			beanProvider.addBean(nonSignalBean);
 			beanProvider.addBean(decoratedBean);
 			
-			processor = new MediateSignalProcessor();
+			processor = new SignalHandlerProcessor();
 
 			swiz = new Swiz(new EventDispatcher(), new SwizConfig(), null, [beanProvider], [processor]);			
 			swiz.init();
@@ -115,8 +115,8 @@ package com.foomonger.swizframework.processors {
 		}
 		
 		public function test_setUpMetadataTag_signal_byBeanName_beanProperty():void {
-			var beanArg:MetadataArg = new MetadataArg("bean", SIGNAL_BEAN_NAME);
-			var metadataTag:IMetadataTag = createMetadataTag([beanArg], listenerHostNode);
+			var nameArg:MetadataArg = new MetadataArg("name", SIGNAL_BEAN_NAME);
+			var metadataTag:IMetadataTag = createMetadataTag([nameArg], listenerHostNode);
 			signal.mock.property("valueClasses").returns([]);
 			signal.mock.method("add").once.withArgs(listener);
 			processor.setUpMetadataTag(metadataTag, decoratedBean);
@@ -136,7 +136,7 @@ package com.foomonger.swizframework.processors {
 			var defaultArg:MetadataArg = new MetadataArg("", DELUXE_SIGNAL_BEAN_NAME);
 			var metadataTag:IMetadataTag = createMetadataTag([defaultArg], listenerHostNode);
 			deluxeSignal.mock.property("valueClasses").returns([]);
-			deluxeSignal.mock.method("add").once.withArgs(listener, 0);
+			deluxeSignal.mock.method("addWithPriority").once.withArgs(listener, 0);
 			processor.setUpMetadataTag(metadataTag, decoratedBean);
 			deluxeSignal.mock.verify();
 		}
@@ -146,7 +146,7 @@ package com.foomonger.swizframework.processors {
 			var priorityArg:MetadataArg = new MetadataArg("priority", "2");
 			var metadataTag:IMetadataTag = createMetadataTag([defaultArg, priorityArg], listenerHostNode);
 			deluxeSignal.mock.property("valueClasses").returns([]);
-			deluxeSignal.mock.method("add").once.withArgs(listener, int(priorityArg.value));
+			deluxeSignal.mock.method("addWithPriority").once.withArgs(listener, int(priorityArg.value));
 			processor.setUpMetadataTag(metadataTag, decoratedBean);
 			deluxeSignal.mock.verify();
 		}
@@ -160,8 +160,8 @@ package com.foomonger.swizframework.processors {
 		}
 				
 		public function test_tearDownMetadataTag_signal_byBeanName_beanProperty():void {
-			var beanArg:MetadataArg = new MetadataArg("bean", SIGNAL_BEAN_NAME);
-			var metadataTag:IMetadataTag = createMetadataTag([beanArg], listenerHostNode);
+			var nameArg:MetadataArg = new MetadataArg("name", SIGNAL_BEAN_NAME);
+			var metadataTag:IMetadataTag = createMetadataTag([nameArg], listenerHostNode);
 			signal.mock.method("remove").once.withArgs(listener);
 			processor.tearDownMetadataTag(metadataTag, decoratedBean);
 			signal.mock.verify();
@@ -269,8 +269,7 @@ package com.foomonger.swizframework.processors {
 		private function createMetadataTag(args:Array, hostNode:XML):IMetadataTag {
 			var metadataTag:IMetadataTag = new BaseMetadataTag();
 			metadataTag.args = args;
-			var factory:MetadataHostFactory = new MetadataHostFactory(ApplicationDomain.currentDomain);
-			metadataTag.host = factory.getMetadataHost(hostNode);
+			metadataTag.host = MetadataHostFactory.getMetadataHost(hostNode, ApplicationDomain.currentDomain);
 			return metadataTag;
 		}
 	}

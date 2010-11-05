@@ -9,7 +9,7 @@
 		<![CDATA[
 			import com.foomonger.swizframework.processors.LoggerProcessorTest;
 			import com.foomonger.swizframework.processors.ResourceProcessorTest;
-			import com.foomonger.swizframework.processors.MediateSignalProcessorTest;
+			import com.foomonger.swizframework.processors.SignalHandlerProcessorTest;
 			
 			import flexunit.framework.TestSuite;
 			
@@ -18,7 +18,7 @@
 				
 				suite.addTestSuite(LoggerProcessorTest);
 				suite.addTestSuite(ResourceProcessorTest);
-				suite.addTestSuite(MediateSignalProcessorTest);
+				suite.addTestSuite(SignalHandlerProcessorTest);
 				
 				testRunner.test = suite;
 				testRunner.startTest();
