@@ -2,7 +2,7 @@
 <mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" 
 		xmlns:local="*"
 		xmlns:view="example.view.*"
-		layout="vertical">
+		layout="vertical" viewSourceURL="srcview/index.html">
 	<local:ResourceProcessorExampleSwiz/>
-	<view:MainView/>
+	<view:MainViewAlt1/>
 </mx:Application>
