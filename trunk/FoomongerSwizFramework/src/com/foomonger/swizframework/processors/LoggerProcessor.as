@@ -23,8 +23,8 @@ package com.foomonger.swizframework.processors {
 	import org.swizframework.utils.logging.SwizLogger;
 
 	/**
-	 * LoggerProcessor injects an ILogger instance to the decorated property
-	 * using the Bean source as the ILogger target.
+	 * LoggerProcessor injects a SwizLogger instance to the decorated property
+	 * using the Bean source as the SwizLogger target.
 	 */ 
 	public class LoggerProcessor extends BaseMetadataProcessor {
 
