@@ -1,4 +1,4 @@
-#summary Using the [SignalHandler] custom metadata tag (v1.5.0beta2)
+#summary Using the [SignalHandler] custom metadata tag (v1.5.0beta3)
 #labels Featured
 
 !SignalHandlerProcessor is the Signal version of !EventHandlerProcessor (previously known as !MediateProcessor). It is used to automatically add listeners to your Signal Beans.
