@@ -1,4 +1,4 @@
-#summary Using the [Logger] custom metadata tag (v1.5.0beta2)
+#summary Using the [Logger] custom metadata tag (v1.5.0beta3)
 #labels Featured
 
 !LoggerProcessor injects a SwizLogger instance to the decorated property using the Bean source as the SwizLogger target. It's processor priority is 1 above the `[Inject]` priority so the logger instance will be availble at `[Inject]` and `[PostConstruct]`.
