@@ -16,12 +16,13 @@ limitations under the License.
 
 package com.foomonger.swizframework.processors {
 
-	import flash.utils.getDefinitionByName;
+	import flash.system.ApplicationDomain;
 	
-	import org.osflash.signals.IDeluxeSignal;
+	import org.osflash.signals.IPrioritySignal;
 	import org.osflash.signals.ISignal;
 	import org.swizframework.core.Bean;
 	import org.swizframework.processors.BaseMetadataProcessor;
+	import org.swizframework.processors.ProcessorPriority;
 	import org.swizframework.reflection.BaseMetadataTag;
 	import org.swizframework.reflection.IMetadataTag;
 	import org.swizframework.reflection.MetadataArg;
@@ -30,15 +31,16 @@ package com.foomonger.swizframework.processors {
 	import org.swizframework.utils.logging.SwizLogger;
 
 	/**
-	 * MediateSignalProcessor is the Signal version of MediateProcessor. After defining 
-	 * Signal or DeluxeSignal Beans, decorate Signal listener methods with the [MediateSignal]
-	 * metadata tag and set a bean name ("bean" property) or type ("type" property) which 
-	 * is useful when subclassing Signals. "bean" is the default property. You may also use 
-	 * the "priority" property for DeluxeSignals. 
+	 * SignalHandlerProcessor is the Signal version of EventHandlerProcessor. 
+	 * After defining Signal Beans, decorate Signal listener methods with the 
+	 * [SignalHandler] metadata tag and set a bean name ("name" property) or 
+	 * type ("type" property) which is useful when subclassing Signals. 
+	 * "name" is the default property. You may also use the "priority" property 
+	 * for DeluxeSignals. 
 	 */ 
-	public class MediateSignalProcessor extends BaseMetadataProcessor {
+	public class SignalHandlerProcessor extends BaseMetadataProcessor {
 
-		protected static const MEDIATE_SIGNAL:String = "MediateSignal";
+		protected static const SIGNAL_HANDLER:String = "SignalHandler";
 		
 		protected static const WILDCARD_PACKAGE:RegExp = /\A(.*)(\.\**)\Z/;
 		
@@ -55,20 +57,24 @@ package com.foomonger.swizframework.processors {
 		public function set signalPackages(value:*):void {
 			_signalPackages = parsePackageValue(value);
 		}
+		
+		override public function get priority():int {
+			return ProcessorPriority.EVENT_HANDLER - 1;
+		}
  
-		public function MediateSignalProcessor() {
-			super([MEDIATE_SIGNAL]);
+		public function SignalHandlerProcessor() {
+			super([SIGNAL_HANDLER]);
 		}
  
 		override public function setUpMetadataTag(metadataTag:IMetadataTag, bean:Bean):void {
 			var signalBean:Bean = getSignalBean(metadataTag);
 			
 			if (signalBean == null) {
-				logger.error("[MediateSignalProcessor] Bean not found for tag {0}", (metadataTag as BaseMetadataTag).asTag);
+				logger.error("[SignalHandlerProcessor] Bean not found for tag {0}", (metadataTag as BaseMetadataTag).asTag);
 				return;
 			}
-			if (!(signalBean.source is ISignal) && !(signalBean.source is IDeluxeSignal)) {
-				logger.error("[MediateSignalProcessor] Bean source is not a Signal for tag {0}", (metadataTag as BaseMetadataTag).asTag);
+			if (!(signalBean.source is ISignal) && !(signalBean.source is IPrioritySignal)) {
+				logger.error("[SignalHandlerProcessor] Bean source is not a Signal for tag {0}", (metadataTag as BaseMetadataTag).asTag);
 				return;
 			}
 			var hostParameters:Array = (metadataTag.host as MetadataHostMethod).parameters;
@@ -77,20 +83,22 @@ package com.foomonger.swizframework.processors {
 											: [];
 			
 			if (!isValidHostArguments(hostParameters, signalValueClasses)) {
-				logger.error("[MediateSignalProcessor] Invalid Signal listener arguments. {0}.{1}()", String(bean.source), metadataTag.host.name);
+				logger.error("[SignalHandlerProcessor] Invalid Signal listener arguments. {0}.{1}()", String(bean.source), metadataTag.host.name);
 				return;
 			}
 			
 			var listener:Function = bean.source[metadataTag.host.name];
 			
 			if (signalBean.source is ISignal) {
-				var signal:ISignal = signalBean.source as ISignal;
-				signal.add(listener);
-			} else if (signalBean.source is IDeluxeSignal) {
-				var deluxeSignal:IDeluxeSignal = signalBean.source as IDeluxeSignal;
-				var priorityArg:MetadataArg = metadataTag.getArg("priority");
-				var priority:int = priorityArg ? int(priorityArg.value) : 0; 
-				deluxeSignal.add(listener, priority);
+				if (signalBean.source is IPrioritySignal) {
+					var prioritySignal:IPrioritySignal = signalBean.source as IPrioritySignal;
+					var priorityArg:MetadataArg = metadataTag.getArg("priority");
+					var priority:int = priorityArg ? int(priorityArg.value) : 0; 
+					prioritySignal.addWithPriority(listener, priority);
+				} else {
+					var signal:ISignal = signalBean.source as ISignal;
+					signal.add(listener);
+				}
 			}
 		}
 						
@@ -103,14 +111,14 @@ package com.foomonger.swizframework.processors {
 				if (signalBean.source is ISignal) {
 					var signal:ISignal = signalBean.source as ISignal;
 					signal.remove(listener);
-				} else if (signalBean.source is IDeluxeSignal) {
-					var deluxeSignal:IDeluxeSignal = signalBean.source as IDeluxeSignal; 
+				} else if (signalBean.source is IPrioritySignal) {
+					var deluxeSignal:IPrioritySignal = signalBean.source as IPrioritySignal; 
 					deluxeSignal.remove(listener);
 				}
 			}
 		}
  
-		private function getSignalBean(metadataTag:IMetadataTag):Bean {
+		protected function getSignalBean(metadataTag:IMetadataTag):Bean {
 			var signalBean:Bean;
 			
 			// First find Bean by name
@@ -119,9 +127,9 @@ package com.foomonger.swizframework.processors {
 			if (defaultArg) {
 				beanName = defaultArg.value;
 			} else {
-				var beanArg:MetadataArg = metadataTag.getArg("bean");
-				if (beanArg) {
-					beanName = beanArg.value;
+				var nameArg:MetadataArg = metadataTag.getArg("name");
+				if (nameArg) {
+					beanName = nameArg.value;
 				}
 			}
 			if (beanName) {
@@ -134,9 +142,9 @@ package com.foomonger.swizframework.processors {
 				if (typeArg) {
 					var type:Class;
 					if (signalPackages.length > 0) {
-						type = findClassDefinition(typeArg.value, signalPackages);
+						type = findClassDefinition(swiz.domain, typeArg.value, signalPackages);
 					} else {
-						type = getClassDefinitionByName(typeArg.value) as Class;
+						type = getClassDefinition(swiz.domain, typeArg.value) as Class;
 					}
 					if (type) {
 						signalBean = beanFactory.getBeanByType(type);
@@ -147,7 +155,7 @@ package com.foomonger.swizframework.processors {
 			return signalBean;
 		}
 		
-		private function isValidHostArguments(hostParameters:Array, signalValueClasses:Array):Boolean {
+		protected function isValidHostArguments(hostParameters:Array, signalValueClasses:Array):Boolean {
 			// Compare lengths
 			if (hostParameters.length != signalValueClasses.length) {
 				return false;
@@ -175,7 +183,7 @@ package com.foomonger.swizframework.processors {
 		Parser method copied from SwizConfig so that logic is consitent with eventPackages.
 		*/
 		
-		private static function parsePackageValue(value:*):Array {
+		protected static function parsePackageValue(value:*):Array {
 			if (value == null) {
 				return [];
 			} else if (value is Array) {
@@ -187,7 +195,7 @@ package com.foomonger.swizframework.processors {
 			}
 		}
 
-		private static function parsePackageNames( packageNames:Array):Array {
+		protected static function parsePackageNames( packageNames:Array):Array {
 			var parsedPackageNames:Array = [];
 			
 			for each(var packageName:String in packageNames) {
@@ -197,7 +205,7 @@ package com.foomonger.swizframework.processors {
 			return parsedPackageNames;
 		}
 		
-		private static function parsePackageName(packageName:String):String {
+		protected static function parsePackageName(packageName:String):String {
 			var match:Object = WILDCARD_PACKAGE.exec(packageName);
 			if (match) {
 				return match[1];
@@ -208,25 +216,23 @@ package com.foomonger.swizframework.processors {
 		/*
 		Lookup logic copied from ClassConstant.
 		*/
-		private static function findClassDefinition(className:String, packageNames:Array):Class {
-			var definition:Class;
-			for each(var packageName:String in packageNames) {
-				definition = getClassDefinitionByName(packageName + "." + className) as Class;
+		protected static function findClassDefinition(domain:ApplicationDomain, className:String, packageNames:Array):Class {
+			for each (var packageName:String in packageNames) {
+				var definition:Class = getClassDefinition(domain, packageName + "." + className);
 				if (definition != null) {
-					break;
+					return definition;
 				}
 			}
-			return definition;
+			
+			return null;
 		}
 		
-		private static function getClassDefinitionByName(className:String):Class {
-			var definition:Class;
+		protected static function getClassDefinition(domain:ApplicationDomain, name:String):Class {
 			try {
-				definition = getDefinitionByName(className) as Class;
-			} catch (e:Error) {
-				// Nothing
-			}
-			return definition;
+				return domain.getDefinition( name ) as Class;
+			} catch( e:ReferenceError ) {}
+			
+			return null;
 		}
 	}
 }
