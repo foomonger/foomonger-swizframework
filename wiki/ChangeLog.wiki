@@ -2,7 +2,7 @@
 #labels Featured
 
 ----
-v1.5.0beta2
+v1.5.0beta3
 
 Changed MediateSignal to SignalHandler.
 
