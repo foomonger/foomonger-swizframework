@@ -4,7 +4,7 @@
  * Create !BaseMetadataTag subclasses for processors.
  * Improve comments. Include examples for asdocs.
  * Create build scripts.
- * Something cool with !ResourceProcessor and bundles and ObjectProxy
+ * Something cool with !ResourceProcessor and bundles and !ObjectProxy
 
 == In Progress ==
 
