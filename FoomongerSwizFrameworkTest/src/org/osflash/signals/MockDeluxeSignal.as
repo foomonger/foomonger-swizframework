@@ -10,9 +10,12 @@ package org.osflash.signals {
 			mock = new Mock(this);
 		}
 		
-		// Not in IDeluxeSignal but in DeluxeSignal for some reason
 		public function get valueClasses():Array {
 			return mock.valueClasses;
+		}
+		
+		public function set valueClasses(value:Array):void {
+			mock.valueClasses = value;
 		}
 		
 		public function get numListeners():uint {

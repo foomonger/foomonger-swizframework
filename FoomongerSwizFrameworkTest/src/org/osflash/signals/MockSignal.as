@@ -14,6 +14,10 @@ package org.osflash.signals {
 			return mock.valueClasses;
 		}
 		
+		public function set valueClasses(value:Array):void {
+			mock.valueClasses = value;
+		}
+		
 		public function get numListeners():uint {
 			return mock.numListeners;
 		}
