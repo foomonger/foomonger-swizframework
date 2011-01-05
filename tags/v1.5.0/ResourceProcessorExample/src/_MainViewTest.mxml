@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!---
+This is an example of a view test harness for the MainView component. Note that
+there is no reference to the ResourceManager.
+-->
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" 
+		xmlns:local="*"
+		xmlns:view="example.view.*"
+		layout="vertical"
+		creationComplete="creationCompleteHandler(event)">
+	<mx:Script>
+		<![CDATA[
+			import example.model.MainViewModel;
+			
+			import mx.events.FlexEvent;
+
+			[Bindable]
+			private var model:MainViewModel;
+			
+			protected function creationCompleteHandler(event:FlexEvent):void {
+				model = new MainViewModel();
+				main.model = model;
+			}
+		]]>
+	</mx:Script>
+	<mx:Form>
+		<mx:FormItem label="Title">
+			<mx:TextInput id="titleInput" 
+				change="{model.title = titleInput.text}"/>
+		</mx:FormItem>
+		<mx:FormItem label="Subtitle">
+			<mx:TextInput id="subtitleInput" 
+				change="{main.subtitle = subtitleInput.text}"/>
+		</mx:FormItem>
+	</mx:Form>
+	<mx:HRule width="100%"/>
+	<view:MainView id="main"/>
+</mx:Application>
