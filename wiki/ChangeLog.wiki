@@ -2,6 +2,11 @@
 #labels Featured
 
 ----
+v1.5.0
+
+Compiled and tested against as3-signals-v0.8 and swiz-framework-v1.0.0. No code changes from v1.5.0beta3.
+
+----
 v1.5.0beta3
 
 Changed MediateSignal to SignalHandler.
