@@ -1,4 +1,4 @@
-#summary Using the [Resource] custom metadata tag (v1.5.0beta3)
+#summary Using the [Resource] custom metadata tag (v1.5.0)
 #labels Featured
 
 Example [http://www.foomonger.com/swizframework/ResourceProcessorExample/ResourceProcessorExample.swf SWF] and [http://www.foomonger.com/swizframework/ResourceProcessorExample/srcview/ Source].
