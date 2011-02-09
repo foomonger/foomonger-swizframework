@@ -22,6 +22,7 @@ package com.foomonger.swizframework.processors {
 	import mx.binding.utils.ChangeWatcher;
 	import mx.resources.IResourceManager;
 	import mx.resources.ResourceManager;
+	import mx.utils.ObjectProxy;
 	
 	import org.swizframework.core.Bean;
 	import org.swizframework.processors.BaseMetadataProcessor;
@@ -42,11 +43,11 @@ package com.foomonger.swizframework.processors {
 		
 		protected var resourceManager:IResourceManager = ResourceManager.getInstance();
 		
-		internal var sources:Dictionary;
+		internal var sites:Dictionary;
 		
 		public function ResourceProcessor() {
 			super([RESOURCE]);
-			sources = new Dictionary(true);
+			sites = new Dictionary(true);
 		}
  
 		override public function setUpMetadataTag(metadataTag:IMetadataTag, bean:Bean):void {
@@ -69,44 +70,71 @@ package com.foomonger.swizframework.processors {
 							return value;
 						}
 			};
+			
 			// Bind property
-			var watcher:ChangeWatcher = BindingUtils.bindProperty(bean.source, metadataTag.host.name, 
-																	resourceManager, chain);
+			var watcher:ChangeWatcher;
+			var site:Object;
+			var prop:String;
+			
+			if (bean.source[metadataTag.host.name] is ObjectProxy) {
+				site = bean.source[metadataTag.host.name];
+				prop = key;
+			} else {
+				site = bean.source;
+				prop = metadataTag.host.name;
+			}
+			
+			watcher = BindingUtils.bindProperty(site, prop, resourceManager, chain);
+			
 			if (watcher) {
 				// Save the watcher for unbinding
-				addWatcher(bean.source, metadataTag.host.name, watcher);
+				addWatcher(site, prop, watcher);
 			} else {
 				logger.error("[ResourceProcessor] Unable to create binding for tag {0}", (metadataTag as BaseMetadataTag).asTag);
 			}
 		}
 						
 		override public function tearDownMetadataTag(metadataTag:IMetadataTag, bean:Bean):void {
-			var watcher:ChangeWatcher = getWatcher(bean.source, metadataTag.host.name);
+			var watcher:ChangeWatcher;
+			var site:Object;
+			var prop:String;
+			
+			if (bean.source[metadataTag.host.name] is ObjectProxy) {
+				site = bean.source[metadataTag.host.name];
+				var keyArg:MetadataArg = metadataTag.getArg("key");
+				var key:String = keyArg ? keyArg.value : "";
+				prop = key;
+			} else {
+				site = bean.source;
+				prop = metadataTag.host.name;
+			}
+			
+			watcher = getWatcher(site, prop);
 			if (watcher) {
 				watcher.unwatch();
-				removeWatcher(bean.source, metadataTag.host.name);
+				removeWatcher(site, prop);
 			}
 		}
 		
-		protected function addWatcher(source:*, hostName:String, watcher:ChangeWatcher):void {
-			if (sources[source] == null) {
-				sources[source] = {};
+		protected function addWatcher(site:Object, prop:String, watcher:ChangeWatcher):void {
+			if (sites[site] == null) {
+				sites[site] = {};
 			}
-			var hosts:Object = sources[source] as Object;
-			hosts[hostName] = watcher;
+			var hosts:Object = sites[site] as Object;
+			hosts[prop] = watcher;
 		}
 		
-		protected function getWatcher(source:*, hostName:String):ChangeWatcher {
+		protected function getWatcher(site:Object, prop:String):ChangeWatcher {
 			var watcher:ChangeWatcher;
-			var hosts:Object = sources[source] as Object;
+			var hosts:Object = sites[site] as Object;
 			if (hosts) {
-				watcher = hosts[hostName] as ChangeWatcher;
+				watcher = hosts[prop] as ChangeWatcher;
 			}
 			return watcher;
 		}
 		
 		protected function removeWatcher(source:*, hostName:String):void {
-			var hosts:Object = sources[source] as Object;
+			var hosts:Object = sites[source] as Object;
 			if (hosts == null) {
 				return;
 			}
@@ -122,8 +150,8 @@ package com.foomonger.swizframework.processors {
 			}
 			// If no more then delete source record
 			if (count == 0) {
-				sources[source] = null;
-				delete sources[source];
+				sites[source] = null;
+				delete sites[source];
 			}
 		}
 	}
