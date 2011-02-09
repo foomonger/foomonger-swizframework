@@ -29,7 +29,7 @@ package example.model {
 		}
 		
 		public function usePigLatin():void {
-			resourceManager.localeChain = [LocaleEnum.PIG_LATIN];
+			resourceManager.localeChain = [LocaleEnum.PIG_LATIN, LocaleEnum.EN_US];
 		}
 		
 	}

@@ -10,6 +10,7 @@ package com.foomonger.swizframework.processors {
 	import mx.resources.IResourceManager;
 	import mx.resources.ResourceBundle;
 	import mx.resources.ResourceManager;
+	import mx.utils.ObjectProxy;
 	
 	import org.swizframework.core.Bean;
 	import org.swizframework.core.BeanProvider;
@@ -26,7 +27,8 @@ package com.foomonger.swizframework.processors {
 	
 	public class ResourceProcessorTest extends TestCase {
 		
-		private static const HOST_NAME:String = "title";
+		private static const HOST_NAME_STANDARD:String = "title";
+		private static const HOST_NAME_PROXY:String = "resources";
 		private static const KEY:String = "title";
 		private static const BUNDLE:String = "test";
 		private static const EN_US:String = "en_US";
@@ -39,7 +41,8 @@ package com.foomonger.swizframework.processors {
 		private var beanProvider:IBeanProvider;
 		private var decoratedBean:Bean;
 		private var decoratedBeanSource:Object;
-		private var propertyHostNode:XML;
+		private var propertyHostStandardNode:XML;
+		private var propertyHostProxyNode:XML;
 		private var resourceManager:IResourceManager;
 		private var resourceBundle:IResourceBundle;
 		private var resourceBundle2:IResourceBundle;
@@ -51,7 +54,8 @@ package com.foomonger.swizframework.processors {
 			resourceBundle.content[KEY] = HELLO_WORLD_EN_US;
 			resourceBundle2 = new ResourceBundle(PIG_LATIN, BUNDLE);
 			resourceBundle2.content[KEY] = HELLO_WORLD_PIG_LATIN;
-			propertyHostNode = <variable name={HOST_NAME} type="String"/>;
+			propertyHostStandardNode = <variable name={HOST_NAME_STANDARD} type="String"/>;
+			propertyHostProxyNode = <variable name={HOST_NAME_PROXY} type="mx.utils::ObjectProxy"/>;
 
 		}
 		
@@ -68,32 +72,58 @@ package com.foomonger.swizframework.processors {
 			processor.init(swiz);
 		}
 		
-		public function test_setUp_tearDown():void {
+		public function test_standard_setUp_tearDown():void {
 			var keyArg:MetadataArg = new MetadataArg("key", KEY);
 			var bundleArg:MetadataArg = new MetadataArg("bundle", BUNDLE);
-			var metadataTag:IMetadataTag = createMetadataTag([keyArg, bundleArg], propertyHostNode);
+			var metadataTag:IMetadataTag = createMetadataTag([keyArg, bundleArg], propertyHostStandardNode);
 			// Null to start
-			assertNull(decoratedBeanSource[HOST_NAME]);
+			assertNull(decoratedBeanSource[HOST_NAME_STANDARD]);
 			// Set up
 			processor.setUpMetadataTag(metadataTag, decoratedBean);
 			// Set up should set the inital value
-			assertEquals(HELLO_WORLD_EN_US, decoratedBeanSource[HOST_NAME]);
+			assertEquals(HELLO_WORLD_EN_US, decoratedBeanSource[HOST_NAME_STANDARD]);
 			// Change localeChain to trigger binding change
 			resourceManager.localeChain = [PIG_LATIN];
 			// Test binding update value
-			assertEquals(HELLO_WORLD_PIG_LATIN, decoratedBeanSource[HOST_NAME]);
+			assertEquals(HELLO_WORLD_PIG_LATIN, decoratedBeanSource[HOST_NAME_STANDARD]);
 			// Tear down
 			processor.tearDownMetadataTag(metadataTag, decoratedBean);
 			// Value should be the same
-			assertEquals(HELLO_WORLD_PIG_LATIN, decoratedBeanSource[HOST_NAME]);
+			assertEquals(HELLO_WORLD_PIG_LATIN, decoratedBeanSource[HOST_NAME_STANDARD]);
 			// Change localeChain to trigger binding change
 			resourceManager.localeChain = [EN_US];
 			// Value should not change because binding is removed
-			assertEquals(HELLO_WORLD_PIG_LATIN, decoratedBeanSource[HOST_NAME]);
+			assertEquals(HELLO_WORLD_PIG_LATIN, decoratedBeanSource[HOST_NAME_STANDARD]);
+		}
+		
+		public function test_proxy_setUp_tearDown():void {
+			var keyArg:MetadataArg = new MetadataArg("key", KEY);
+			var bundleArg:MetadataArg = new MetadataArg("bundle", BUNDLE);
+			var metadataTag:IMetadataTag = createMetadataTag([keyArg, bundleArg], propertyHostProxyNode);
+			// Require ObjectProxy to be instantiated
+			decoratedBeanSource[HOST_NAME_PROXY] = new ObjectProxy();
+			// Null to start
+			assertNull(decoratedBeanSource[HOST_NAME_PROXY][KEY]);
+			// Set up
+			processor.setUpMetadataTag(metadataTag, decoratedBean);
+			// Set up should set the inital value on the ObjectProxy
+			assertEquals(HELLO_WORLD_EN_US, decoratedBeanSource[HOST_NAME_PROXY][KEY]);
+			// Change localeChain to trigger binding change
+			resourceManager.localeChain = [PIG_LATIN];
+			// Test binding update value
+			assertEquals(HELLO_WORLD_PIG_LATIN, decoratedBeanSource[HOST_NAME_PROXY][KEY]);
+			// Tear down
+			processor.tearDownMetadataTag(metadataTag, decoratedBean);
+			// Value should be the same
+			assertEquals(HELLO_WORLD_PIG_LATIN, decoratedBeanSource[HOST_NAME_PROXY][KEY]);
+			// Change localeChain to trigger binding change
+			resourceManager.localeChain = [EN_US];
+			// Value should not change because binding is removed
+			assertEquals(HELLO_WORLD_PIG_LATIN, decoratedBeanSource[HOST_NAME_PROXY][KEY]);
 		}
 		
 		public function test_setUp_propertiesError():void {
-			var metadataTag:IMetadataTag = createMetadataTag([], propertyHostNode);
+			var metadataTag:IMetadataTag = createMetadataTag([], propertyHostStandardNode);
 			var logger:MockSwizLogger = new MockSwizLogger("mock");
 			logger.mock.method("error").withAnyArgs.once;
 			processor.logger = logger;

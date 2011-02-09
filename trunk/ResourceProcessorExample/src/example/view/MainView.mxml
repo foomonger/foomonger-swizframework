@@ -4,6 +4,8 @@
 		<![CDATA[
 			import example.model.MainViewModel;
 			
+			import mx.utils.ObjectProxy;
+			
 			[Inject]
 			[Bindable]
 			public var model:MainViewModel;
@@ -12,14 +14,20 @@
 			[Bindable]
 			public var subtitle:String;
 			
+			[Resource(key="title", bundle="example")]
+			[Resource(key="subtitle", bundle="example")]
+			[Bindable]
+			public var resources:ObjectProxy = new ObjectProxy();
 		]]>
 	</mx:Script>
 	<mx:Form>
 		<mx:FormItem label="Title Resource:">
-			<mx:Label text="{model.title}" width="100"/>
+			<mx:Label text="{model.title}" width="150"/>
+			<mx:Label text="{resources.title}" width="150"/>
 		</mx:FormItem>
 		<mx:FormItem label="Subtitle Resource:">
-			<mx:Label text="{subtitle}" width="100"/>
+			<mx:Label text="{subtitle}" width="150"/>
+			<mx:Label text="{resources.subtitle}" width="150"/>
 		</mx:FormItem>
 		<mx:FormItem label="Background Resource:">
 			<mx:Image source="{model.background}"/>
