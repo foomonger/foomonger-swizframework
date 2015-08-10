@@ -1,0 +1,71 @@
+
+---
+
+v1.5.0
+
+Compiled and tested against as3-signals-v0.8 and swiz-framework-v1.0.0. No code changes from v1.5.0beta3.
+
+
+---
+
+v1.5.0beta3
+
+Changed MediateSignal to SignalHandler.
+
+Changed to work the lastest AS3Signals source that helps you define Signals in MXML.
+
+Works with as3-signals-v0.7-15-g75a05a2 and swiz-framework-v1.0.0-RC2-48-gceca861. These SWCs are provided in the downloads section.
+
+This should come out of beta with the next formal releases of AS3Signals and Swiz Framework.
+
+
+---
+
+v1.4.0
+
+Updated to work with Swiz 1.0.0 RC1
+
+Removed SwizLoggerConfig.
+
+
+---
+
+v1.3.0
+
+Created SwizLoggerConfig with example project.
+
+Created LoggerProcessor with example project (same as SwizLoggerConfig).
+
+
+---
+
+v1.2.0
+
+Created ResourceProcessor with tests and example project.
+
+Created example project for MediateSignalProcessor.
+
+Added logging to MediateSignalProcessor. Replaced the RTE with an error log.
+
+Included metadata tags in the SWC.
+
+
+---
+
+v1.1.0
+
+Added signalPackages property which acts just like SwizConfig.eventPackages.
+
+Added strictArgumentTypes property. If true, listener arguments are checked against Signal valueClasses.
+
+
+---
+
+v1.0.0
+
+First release.
+
+Supports looking up Signal by Bean name and type.
+
+
+---

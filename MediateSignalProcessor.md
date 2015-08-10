@@ -1,0 +1,36 @@
+MediateSignalProcessor is the Signal version of MediateProcessor. It is used to automatically add listeners to your Signal Beans.
+
+Example [SWF](http://www.foomonger.com/swizframework/MediateSignalProcessorExample/MediateSignalProcessorExample.swf) and [Source](http://www.foomonger.com/swizframework/MediateSignalProcessorExample/srcview/).
+
+Usage:
+
+  1. If using the source directly, add `MediateSignal` to the list of metadata tags to keep when compiling. The `MediateSignal` tag is included in the SWC as of v1.2.0.
+  1. Add MediateSignalProcessor to the Swiz instance
+  1. Decorate methods with `[MediateSignal]` (with appropriate properties). The processor will add the method to a Signal Bean.
+
+`[MediateSignal]` Options:
+
+You define which Signal Bean to use by:
+
+Bean name. E.g.
+> `[MediateSignal(bean="mySignalBeanName")]`
+
+> "bean" is the default property so the above is the same as:
+
+> `[MediateSignal("mySignalBeanName")]`
+Bean type. E.g.
+> `[MediateSignal(type="com.foomonger.signals.UpdateBarSignal")]`
+
+> This is useful when subclassing Signals.
+
+> You can define `signalPackages` on the processor instance just like  `eventPackages` on SwizConfig. E.g.
+> > Processor:
+> > > `<processors:MediateSignalProcessor signalPackages="com.foomonger.signals"/>`
+
+> > Metadata:
+> > > `[MediateSignal(type="UpdateBarSignal")]`
+The processor always compares the listener's argument length with the Signal's valueClasses. It will throw an error if the lengths do not match. The processor will also strictly compare the argument types if you set `strictArgumentTypes =  true`. E.g.
+
+> `<processors:MediateSignalProcessor strictArgumentTypes="true"/>`
+You may also use DeluxeSignals and define the priority. E.g.
+> `[MediateSignal(bean="myDeluxeSignalBean", priority="2")]`

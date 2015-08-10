@@ -1,0 +1,20 @@
+## To Do ##
+  * Create BaseMetadataTag subclasses for processors.
+  * Improve comments. Include examples for asdocs.
+  * Create build scripts.
+  * Something cool with ResourceProcessor and bundles and ObjectProxy
+
+## In Progress ##
+
+## Done ##
+  * Change MediateSignal to SignalHandler to mirror upcoming EventHandler
+  * Update to use the latest source of ASSignals that help you define Signals in MXML
+  * Log warnings and errors in MediateSignalProcessor
+  * Include `[MediateTag]` into SWC
+  * Create example project for `[MediateTag]`
+  * Create `[Resource]` processor
+  * Create example project for `[Resource]`
+  * Create SwizLoggerConfig
+  * Create LoggerProcessor
+  * Removed SwizLoggerConfig as of 1.4.0
+  * Updated to work with Swiz 1.0.0 RC1
